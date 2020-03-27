@@ -1,0 +1,12 @@
+# Don't track content of these folders
+_pycache_/
+env/
+
+
+# Don't track these files
+token.json
+
+
+# Compiled source #
+###################
+*.pyc
