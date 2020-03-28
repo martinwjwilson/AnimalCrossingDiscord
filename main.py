@@ -1,9 +1,10 @@
 import discord
 from discord.ext import commands
+import json
 
 # load cogs
 bot = commands.Bot(command_prefix = ">")
-extensions = [] # list of cogs to call
+extensions = ["search"] # list of cogs to call
 
 # laod bot token
 with open("token.json", 'r') as f:
@@ -56,7 +57,7 @@ async def reload(ctx, extension):
 if __name__ == '__main__':
     for extension in extensions:
         try:
-            bot.load_extension(extension)
+            bot.load_extension(f"cogs.{extension}")
             print(f"Loaded cog: {extension}")
         except Exception as error:
             print(f"{extension} could not be loaded. [{error}]")

@@ -11,7 +11,7 @@ conn = sqlite3.connect("critterpedia.db")
 c = conn.cursor()
 
 # result = requests.get("https://www.polygon.com/animal-crossing-new-horizons-switch-acnh-guide/2020/3/23/21190775/fish-locations-times-month-day-list-critterpedia")
-# result = requests.get("https://www.polygon.com/animal-crossing-new-horizons-switch-acnh-guide/2020/3/24/21191276/insect-bug-locations-times-month-day-list-critterpedia")
+result = requests.get("https://www.polygon.com/animal-crossing-new-horizons-switch-acnh-guide/2020/3/24/21191276/insect-bug-locations-times-month-day-list-critterpedia")
 src = result.content
 soup = BeautifulSoup(src, 'lxml')
 
@@ -27,7 +27,7 @@ for bug in all_bugs:
     bug_name = bug[1].text
     if "'" in bug_name:
         bug_name = bug_name.replace("'", "!")
-    c.execute(f"""INSERT INTO critterpedia
+    c.execute(f"""INSERT INTO bugs
                 (name, type, location, value, time, month)
                 VALUES ('{bug_name}', 'Bug', '{bug[2].text}', '{bug[3].text}', '{bug[4].text}', '{bug[5].text}');""")
     conn.commit() # Commit your changes in the database
