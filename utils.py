@@ -22,7 +22,7 @@ def check_if_it_is_dev(ctx):
 
 
 # SQL STATEMENTS
-def check_for_fish(fish_name):
+def check_for_critter(type, name):
     return f"""SELECT *
-                FROM fish
-                WHERE name = '{fish_name}'"""
+                FROM {type}
+                WHERE name = '{name}'"""
