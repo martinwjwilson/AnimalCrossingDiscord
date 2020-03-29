@@ -39,6 +39,23 @@ class Search(commands.Cog):
 
     @commands.command()
     @commands.check(utils.check_if_it_is_dev)
+    async def bug(self, ctx, starts_with: typing.Optional[str] = ""):
+        # check if there was a letter
+        if starts_with != "":
+            starts_with = utils.format_input(starts_with) # format the input
+            starts_with = f"WHERE name LIKE '{starts_with}%'" # add sql for search
+
+        c.execute(utils.search_all_critters("bugs", starts_with)) # Execute the SQL check
+        bug_list = list(c.fetchall())
+        bug_names = ""
+        for bug in bug_list:
+            bug_names = bug_names + f"{bug[0]}\n"
+        embed = discord.Embed(title = "Bug search", description = bug_names)
+        await ctx.send(embed = embed)
+
+
+    @commands.command()
+    @commands.check(utils.check_if_it_is_dev)
     async def f(self, ctx, *,  fish_name: str):
         fish_name = utils.format_input(fish_name) # format the input
         c.execute(utils.check_for_critter("fish", fish_name)) # Execute the SQL check
