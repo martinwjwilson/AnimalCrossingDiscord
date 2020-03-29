@@ -26,3 +26,9 @@ def check_for_critter(type, name):
     return f"""SELECT *
                 FROM {type}
                 WHERE name = '{name}'"""
+
+def search_all_critters(type, starts_with):
+    return f"""SELECT *
+                FROM {type}
+                {starts_with}
+                ORDER BY name ASC"""

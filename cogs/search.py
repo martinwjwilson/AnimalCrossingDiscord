@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import utils
 import sqlite3
+import typing
 
 
 # db
@@ -17,6 +18,23 @@ class Search(commands.Cog):
     @commands.command()
     async def test(self, ctx, input):
         await ctx.send("nothing here")
+
+
+    @commands.command()
+    @commands.check(utils.check_if_it_is_dev)
+    async def fish(self, ctx, starts_with: typing.Optional[str] = ""):
+        # check if there was a letter
+        if starts_with != "":
+            starts_with = utils.format_input(starts_with) # format the input
+            starts_with = f"WHERE name LIKE '{starts_with}%'" # add sql for search
+
+        c.execute(utils.search_all_critters("fish", starts_with)) # Execute the SQL check
+        fish_list = list(c.fetchall())
+        fish_names = ""
+        for fish in fish_list:
+            fish_names = fish_names + f"{fish[0]}\n"
+        embed = discord.Embed(title = "Fish search", description = fish_names)
+        await ctx.send(embed = embed)
 
 
     @commands.command()
