@@ -1,10 +1,19 @@
-import discord
-from discord.ext import commands
-
 list_of_developers = {
     "Plugs": 146737110974595073,
     "RedVelvetUnderground": 449997098956488724
 }
+
+
+# search formatting
+def format_input(input):
+    str_input = "".join(input) # join arguments together
+    # fix casing
+    word_list = str_input.lower().split(" ") # split each word by space and make lowercase
+    output = []
+    for word in word_list:
+        output.append(word.capitalize()) # capitalise all lowercase words in list
+    return " ".join(output) # join words back together with a space between them
+
 
 # check if a developer is using the command
 def check_if_it_is_dev(ctx):

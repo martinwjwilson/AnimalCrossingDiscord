@@ -15,8 +15,14 @@ class Search(commands.Cog):
 
 
     @commands.command()
+    async def test(self, ctx, input):
+        await ctx.send("nothing here")
+
+
+    @commands.command()
     @commands.check(utils.check_if_it_is_dev)
-    async def f(self, ctx, fish_name: str):
+    async def f(self, ctx, *,  fish_name: str):
+        fish_name = utils.format_input(fish_name) # format the input
         c.execute(utils.check_for_fish(fish_name)) # Execute the SQL check
         fish_list = list(c.fetchone())
 
