@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import json
+import utils
 
 # load cogs
 bot = commands.Bot(command_prefix = ">")
@@ -20,12 +21,14 @@ async def on_ready():
 
 # immediately stop the bot
 @bot.command(hidden = True)
+@commands.check(utils.check_if_it_is_dev)
 async def stop(ctx):
     await bot.logout() # log the bot off
 
 
 # manually load a cog
 @bot.command(hidden = True)
+@commands.check(utils.check_if_it_is_dev)
 async def load(ctx, extension):
     try:
         bot.load_extension(f"cogs.{extension}")
@@ -36,6 +39,7 @@ async def load(ctx, extension):
 
 # manually unload a cog
 @bot.command(hidden = True)
+@commands.check(utils.check_if_it_is_dev)
 async def unload(ctx, extension):
     try:
         bot.unload_extension(f"cogs.{extension}")
@@ -46,6 +50,7 @@ async def unload(ctx, extension):
 
 # manually reload a cog
 @bot.command(hidden = True)
+@commands.check(utils.check_if_it_is_dev)
 async def reload(ctx, extension):
     try:
         bot.reload_extension(f"cogs.{extension}")
