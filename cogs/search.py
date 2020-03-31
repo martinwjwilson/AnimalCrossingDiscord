@@ -19,58 +19,114 @@ class Search(commands.Cog):
     @commands.command()
     @commands.check(utils.check_if_it_is_dev)
     async def test(self, ctx):
-        current_month = date.today().strftime("%B")
-        await ctx.send(current_month)
+        pass
+
+
+    async def month_list(self, start_month: str, end_month: str):
+        """
+        Return a list of months from the start month until the end month
+        """
+        dict_of_all_months = {
+            "January":1,
+            "February":2,
+            "March":3,
+            "April":4,
+            "May":5,
+            "June":6,
+            "July":7,
+            "August":8,
+            "September":9,
+            "October":10,
+            "November":11,
+            "December":12}
+        start_month_int = dict_of_all_months[start_month] # ' November'
+        end_month_int = dict_of_all_months[end_month]
+        list_of_months_available = []
+        # if start month is less than end month, include everything greater than start month and less than or = end month
+        if start_month_int < end_month_int:
+            # print("THIS 1")
+            for month in dict_of_all_months:
+                if dict_of_all_months[month] >= start_month_int and dict_of_all_months[month] <= end_month_int:
+                    list_of_months_available.append(month)
+        # if end month is less than start month, include everything greater or equal to start month and less than or = end month
+        else:
+            # print("THIS 2")
+            for month in dict_of_all_months:
+                if dict_of_all_months[month] >= start_month_int or dict_of_all_months[month] <= end_month_int:
+                    list_of_months_available.append(month)
+
+        # check if current month is in list
+        return list_of_months_available
 
 
     async def availability_review(self, critter_month: str):
+        """
+        Check the availability for an individual critter
+        """
         # check if the critter is all year round
         if critter_month.startswith("Year"):
             return True
 
         # get this months month
         current_month = date.today().strftime("%B")
-        print(f"Current month is: {current_month}")
+        # print(f"Current month is: {current_month}")
         northern_months = critter_month.split("/")[0] # split the critter month into Northern and Southern
-        northern_months = northern_months.split("(")[0] # remove the (northern) section
+        northern_months = northern_months.split("(")[0].strip() # remove the (northern) section
 
         if "," in northern_months: # if critter is available twice a year, split it up
             periods = northern_months.split(",")
             period_1 = periods[0]
             period_2 = periods[1]
             # get start and end months from each period
-            start_month_1, end_month_1 = period_1.split("-")
-            print(f"Start month period 1: {start_month_1}\nEnd Month period 1: {end_month_1}\n")
-            start_month_2, end_month_2 = period_2.split("-")
-            print(f"Start month period 2: {start_month_2}\nEnd Month period 2: {end_month_2}\n")
+            period_1 = period_1.split("-")
+            start_month_1 = period_1[0].strip()
+            end_month_1 = period_1[1].strip()
+            if "-" in period_2:
+                period_2 = period_2.split("-")
+            else: # if it's a ladybug... :v
+                period_2 = [period_2, period_2]
+            start_month_2 = period_2[0].strip()
+            end_month_2 = period_2[1].strip()
+            if (current_month in await self.month_list(start_month_1, end_month_1)) or (current_month in await self.month_list(start_month_2.strip(), end_month_2)):
+                return True
         elif "-" in northern_months: # there is one period per year
             # get start and end months
             start_month, end_month = northern_months.split("-")
-            print(f"Start month: {start_month}\nEnd Month: {end_month}\n")
             # generate a list of months critter is available
+            if current_month in await self.month_list(start_month, end_month):
+                return True
         else: # it is available for a single month per year
-            print(f"{northern_months}\n")
+            if current_month == northern_months:
+                return True
+        return False
 
 
     async def this_month_critter_filter(self, list_of_critters: list):
-        critter_availble_list = [] # list of critters available this month
+        """
+        filters list of all bugs and fish to ones only available this month
+        """
+        critters_availble_list = [] # list of critters available this month
         # check each critter against the current date
         for critter in list_of_critters:
             # check if the critter is a fish or a bug
             if critter[1] == "Fish":
                 # check availability this month
-                print(f"Name: {critter[0]}\nType: {critter[1]}\nMonth: {critter[6]}\n")
+                # print(f"Name: {critter[0]}\nType: {critter[1]}\nMonth: {critter[6]}\n")
                 if await self.availability_review(critter[6]):
-                    pass
+                    critters_availble_list.append(critter[0])
             else:
                 # check availability this month
                 # print(f"Name: {critter[0]}\nType: {critter[1]}\nMonth: {critter[5]}\n")
                 if await self.availability_review(critter[5]):
-                    pass
+                    critters_availble_list.append(critter[0])
+        return critters_availble_list
 
 
     @commands.command()
     async def month(self, ctx):
+        """
+        Get a list of all fish and bugs available this month
+        """
         # get all fish
         c.execute(utils.search_all_critters("fish", "")) # Execute the SQL check
         fish_list = list(c.fetchall())
@@ -78,9 +134,24 @@ class Search(commands.Cog):
         c.execute(utils.search_all_critters("bugs", "")) # Execute the SQL check
         bug_list = list(c.fetchall())
 
-        # get a list of all fish leaving this month
-        await self.this_month_critter_filter(fish_list)
+        description_f = ""
+        description_b = ""
 
+        # get a list of all fish available this month
+        critters_availble_list = await self.this_month_critter_filter(fish_list)
+        print("This is a list of all the fish available this month...")
+        for critter in critters_availble_list:
+            description_f = description_f + f"\n{critter}"
+        # get a list of all bugs available this month
+        critters_availble_list = await self.this_month_critter_filter(bug_list)
+        print("This is a list of all the bugs available this month...")
+        for critter in critters_availble_list:
+            description_b = description_b + f"\n{critter}"
+
+        embed_f = discord.Embed(title = "List of Fish available this month", description = description_f)
+        embed_b = discord.Embed(title = "List of Bugs available this month", description = description_b)
+        await ctx.send(embed = embed_f)
+        await ctx.send(embed = embed_b)
 
     @commands.command()
     async def fish(self, ctx, starts_with: typing.Optional[str] = ""):
