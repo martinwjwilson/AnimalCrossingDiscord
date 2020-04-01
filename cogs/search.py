@@ -16,7 +16,7 @@ class Search(commands.Cog):
         self.bot = bot
 
 
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.check(utils.check_if_it_is_dev)
     async def test(self, ctx):
         pass
@@ -155,6 +155,10 @@ class Search(commands.Cog):
 
     @commands.command()
     async def fish(self, ctx, starts_with: typing.Optional[str] = ""):
+        """
+        Display a list of all fish by name
+        If input is provided then find names beginning with the input
+        """
         # check if there was a letter
         if starts_with != "":
             starts_with = utils.format_input(starts_with) # format the input
@@ -171,7 +175,11 @@ class Search(commands.Cog):
 
     @commands.command()
     async def bug(self, ctx, starts_with: typing.Optional[str] = ""):
-        # check if there was a letter
+        """
+        Display a list of all bugs by name
+        If input is provided then find names beginning with the input
+        """
+        # check if there was an input
         if starts_with != "":
             starts_with = utils.format_input(starts_with) # format the input
             starts_with = f"WHERE name LIKE '{starts_with}%'" # add sql for search
@@ -187,6 +195,9 @@ class Search(commands.Cog):
 
     @commands.command()
     async def f(self, ctx, *,  fish_name: str):
+        """
+        Search for a fish by name and display all of its information
+        """
         fish_name = utils.format_input(fish_name) # format the input
         c.execute(utils.check_for_critter("fish", fish_name)) # Execute the SQL check
         fish_list = list(c.fetchone())
@@ -204,6 +215,9 @@ class Search(commands.Cog):
 
 
     @commands.command()
+    """
+    Search for a bug by name and display all of its information
+    """
     async def b(self, ctx, *,  bug_name: str):
         bug_name = utils.format_input(bug_name) # format the input
         c.execute(utils.check_for_critter("bugs", bug_name)) # Execute the SQL check
