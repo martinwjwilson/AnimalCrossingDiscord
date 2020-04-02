@@ -180,7 +180,7 @@ class Search(commands.Cog):
             # get start and end months
             start_month, end_month = northern_months.split("-")
             # generate a list of months critter is available
-            if current_month == end_month_2:
+            if current_month == end_month:
                 return True
         else: # it is available for a single month per year
             if current_month == northern_months:
@@ -219,14 +219,22 @@ class Search(commands.Cog):
         c.execute(utils.search_all_critters("bugs", "")) # Execute the SQL check
         bug_list = list(c.fetchall())
 
+        description_f = ""
+        description_b = ""
+
         # get a list of all fish available this month
         critters_availble_list = await self.final_month_critter_filter(fish_list)
         print("This is a list of all the fish available this month...")
         for critter in critters_availble_list:
             description_f = description_f + f"\n{critter}"
+        # get a list of all bugs available this month
+        critters_availble_list = await self.final_month_critter_filter(bug_list)
+        print("This is a list of all the bugs available this month...")
+        for critter in critters_availble_list:
+            description_b = description_b + f"\n{critter}"
 
-        embed_f = discord.Embed(title = "List of Fish available this month", description = description_f)
-        embed_b = discord.Embed(title = "List of Bugs available this month", description = description_b)
+        embed_f = discord.Embed(title = "List of Fish leaving this month", description = description_f)
+        embed_b = discord.Embed(title = "List of Bugs leaving this month", description = description_b)
         await ctx.send(embed = embed_f)
         await ctx.send(embed = embed_b)
 
@@ -293,10 +301,10 @@ class Search(commands.Cog):
 
 
     @commands.command()
-    """
-    Search for a bug by name and display all of its information
-    """
     async def b(self, ctx, *,  bug_name: str):
+        """
+        Search for a bug by name and display all of its information
+        """
         bug_name = utils.format_input(bug_name) # format the input
         c.execute(utils.check_for_critter("bugs", bug_name)) # Execute the SQL check
         bug_list = list(c.fetchone())
