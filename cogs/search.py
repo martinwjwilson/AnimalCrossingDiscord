@@ -280,44 +280,55 @@ class Search(commands.Cog):
 
 
     @commands.command()
-    async def f(self, ctx, *,  fish_name: str):
+    async def s(self, ctx, *, critter_name: str):
         """
-        Search for a fish by name and display all of its information
+        Search for a critter by name and display all of its information
         """
-        fish_name = utils.format_input(fish_name) # format the input
-        c.execute(utils.check_for_critter("fish", fish_name)) # Execute the SQL check
-        fish_list = list(c.fetchone())
+        critter_name = utils.format_input(critter_name) # format the input
+        # Check both fish and bug tables
+        c.execute(utils.check_for_critter("fish", critter_name))
+        try:
+            fish_list = list(c.fetchone())
+        except Exception as e:
+            pass
+        c.execute(utils.check_for_critter("bugs", critter_name))
+        try:
+            bug_list = list(c.fetchone())
+        except Exception as e:
+            pass
 
-        # create embed
-        embed = discord.Embed(title = 'Fish Info', description = f"Everything you need to know about the {fish_list[0]}")
-        embed.add_field(name = "Name:", value = fish_list[0], inline = False)
-        embed.add_field(name = "Type:", value = fish_list[1], inline = False)
-        embed.add_field(name = "Location:", value = fish_list[2], inline = False)
-        embed.add_field(name = "Size:", value = fish_list[3], inline = False)
-        embed.add_field(name = "Value:", value = fish_list[4], inline = False)
-        embed.add_field(name = "Time:", value = fish_list[5], inline = False)
-        embed.add_field(name = "Month:", value = fish_list[6], inline = False)
-        await ctx.send(embed = embed)
+        # check which one returned a value if any
+        critter_list = False
+        try:
+            print(fish_list)
+            critter_list = fish_list
+        except Exception as e:
+            pass
+        try:
+            critter_list = bug_list
+            print(bug_list)
+        except Exception as e:
+            pass
 
-
-    @commands.command()
-    async def b(self, ctx, *,  bug_name: str):
-        """
-        Search for a bug by name and display all of its information
-        """
-        bug_name = utils.format_input(bug_name) # format the input
-        c.execute(utils.check_for_critter("bugs", bug_name)) # Execute the SQL check
-        bug_list = list(c.fetchone())
-
-        # create embed
-        embed = discord.Embed(title = 'Bug Info', description = f"Everything you need to know about the {bug_list[0]}")
-        embed.add_field(name = "Name:", value = bug_list[0], inline = False)
-        embed.add_field(name = "Type:", value = bug_list[1], inline = False)
-        embed.add_field(name = "Location:", value = bug_list[2], inline = False)
-        embed.add_field(name = "Value:", value = bug_list[3], inline = False)
-        embed.add_field(name = "Time:", value = bug_list[4], inline = False)
-        embed.add_field(name = "Month:", value = bug_list[5], inline = False)
-        await ctx.send(embed = embed)
+        # if there is a match from the DB
+        if critter_list:
+            # create embed
+            embed = discord.Embed(title = f'{critter_list[1]} Info', description = f"Everything you need to know about the {critter_list[0]}")
+            embed.add_field(name = "Name:", value = critter_list[0], inline = False)
+            embed.add_field(name = "Type:", value = critter_list[1], inline = False)
+            embed.add_field(name = "Location:", value = critter_list[2], inline = False)
+            if len(critter_list) == 7:
+                embed.add_field(name = "Size:", value = critter_list[3], inline = False)
+                embed.add_field(name = "Value:", value = critter_list[4], inline = False)
+                embed.add_field(name = "Time:", value = critter_list[5], inline = False)
+                embed.add_field(name = "Month:", value = critter_list[6], inline = False)
+            else:
+                embed.add_field(name = "Value:", value = critter_list[3], inline = False)
+                embed.add_field(name = "Time:", value = critter_list[4], inline = False)
+                embed.add_field(name = "Month:", value = critter_list[5], inline = False)
+            await ctx.send(embed = embed)
+        else:
+            await ctx.send(f"There was no match for: {critter_name}")
 
 
 def setup(bot):
