@@ -19,7 +19,8 @@ class Search(commands.Cog):
     @commands.command(hidden=True)
     @commands.check(utils.check_if_it_is_dev)
     async def test(self, ctx):
-        pass
+        await ctx.send(file=discord.File("ProfessionalRetard.jpg"))
+
 
 
     async def month_list(self, start_month: str, end_month: str):
@@ -328,7 +329,9 @@ class Search(commands.Cog):
                 embed.add_field(name = "Month:", value = critter_list[5], inline = False)
             await ctx.send(embed = embed)
         else:
-            await ctx.send(f"There was no match for: {critter_name}")
+            embed = discord.Embed(title = f'Good job !', description = f"{critter_name} was not in the Critterpedia")
+            embed.set_image(url = 'https://en.meming.world/images/en/thumb/3/3f/Professional_Retard.jpg/300px-Professional_Retard.jpg')
+            await ctx.send(embed = embed)
 
 
 def setup(bot):
