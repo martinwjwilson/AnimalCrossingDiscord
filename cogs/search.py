@@ -329,9 +329,10 @@ class Search(commands.Cog):
                 embed.add_field(name = "Month:", value = critter_list[5], inline = False)
             await ctx.send(embed = embed)
         else:
-            embed = discord.Embed(title = f'Good job !', description = f"{critter_name} was not in the Critterpedia")
-            embed.set_image(url = 'https://en.meming.world/images/en/thumb/3/3f/Professional_Retard.jpg/300px-Professional_Retard.jpg')
-            await ctx.send(embed = embed)
+            await ctx.send(f"Sorry, {critter_name} is not a valid critter name")
+            # embed = discord.Embed(title = f'Good job !', description = f"{critter_name} was not in the Critterpedia")
+            # embed.set_image(url = 'https://en.meming.world/images/en/thumb/3/3f/Professional_Retard.jpg/300px-Professional_Retard.jpg')
+            # await ctx.send(embed = embed)
 
 
 def setup(bot):
