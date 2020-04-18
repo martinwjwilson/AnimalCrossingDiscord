@@ -5,7 +5,7 @@ import utils
 
 # load cogs
 bot = commands.Bot(command_prefix = ">")
-extensions = ["search"] # list of cogs to call
+extensions = ["admin", "search"] # list of cogs to call
 
 # laod bot token
 with open("token.json", 'r') as f:
