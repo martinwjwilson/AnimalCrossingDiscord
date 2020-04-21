@@ -7,26 +7,21 @@ class Profile(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    # def check(message):
-    #     return message.channel.type == discord.ChannelType.private
 
-    async def pred(self, ctx):
-        print(f"The channel type was: {m.message.channel.type}")
-        return m.message.channel.type == discord.ChannelType.private
 
     # copies the senders message to the specified channel
     @commands.command()
     async def createprofile(self, ctx):
-        # await ctx.message.author.send("What is your villager's name?")
-        # await self.bot.wait_for('message', check = check())
+        def dm_check(m):
+            return m.channel.type == discord.channel.ChannelType.private and m.author == ctx.author
+
+        await ctx.author.send("What is your villager's name?")
         try:
-            msg = await self.bot.wait_for('message', check=self.pred(ctx), timeout=20.0)
+            await self.bot.wait_for('message', check = dm_check, timeout = 10.0)
         except asyncio.TimeoutError:
-            await ctx.message.author.send('You took too long...')
+            await ctx.author.send("The message timed out")
         else:
-            await ctx.message.author.send('You said {0.content}, {0.author}.'.format(msg))
-
-
+            await ctx.author.send("You replied to the message")
 
 
 def setup(bot):
