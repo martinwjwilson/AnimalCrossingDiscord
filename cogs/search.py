@@ -240,6 +240,95 @@ class Search(commands.Cog):
         await ctx.send(embed = embed_b)
 
 
+    async def first_month_check(self, critter_month: str):
+        """
+        Check the if this is the first month available for a critter
+        """
+        # get this months month
+        current_month = date.today().strftime("%B")
+        # print(f"Current month is: {current_month}")
+        northern_months = critter_month.split("/")[0] # split the critter month into Northern and Southern
+        northern_months = northern_months.split("(")[0].strip() # remove the (northern) section
+
+        print(f"\nCritter months: {northern_months}")
+
+        if "," in northern_months: # if critter is available twice a year, split it up
+            periods = northern_months.split(",")
+            period_1 = periods[0]
+            period_2 = periods[1]
+            # get start and end months from each period
+            period_1 = period_1.split("-")
+            start_month_1 = period_1[0].strip()
+            if "-" in period_2:
+                period_2 = period_2.split("-")
+            else: # if it's a ladybug... :v
+                period_2 = [period_2, period_2]
+            start_month_2 = period_2[0].strip()
+            if((current_month == start_month_1) or (current_month == start_month_2)):
+                return True
+        elif "-" in northern_months: # there is one period per year
+            # get start and end months
+            start_month, end_month = northern_months.split("-")
+            # generate a list of months critter is available
+            if current_month == start_month:
+                return True
+        else: # it is available for a single month per year
+            if current_month == northern_months:
+                return True
+        return False
+
+
+    async def first_month_critter_filter(self, list_of_critters: list):
+        """
+        Filters list of all bugs and fish to ones leaving this month
+        """
+        critters_availble_list = [] # list of critters available this month
+        # check each critter against the current date
+        for critter in list_of_critters:
+            # check if the critter is a fish or a bug
+            if critter[1] == "Fish":
+                # check availability this month
+                if await self.first_month_check(critter[6]):
+                    critters_availble_list.append(critter[0])
+            else:
+                # check availability this month
+                if await self.first_month_check(critter[5]):
+                    critters_availble_list.append(critter[0])
+        return critters_availble_list
+
+
+    @commands.command()
+    async def new(self, ctx):
+        """
+        Get a list of all fish and bugs arriving this month
+        """
+        # get all fish
+        c.execute(utils.search_all_critters("fish", "")) # Execute the SQL check
+        fish_list = list(c.fetchall())
+        # get all bugs
+        c.execute(utils.search_all_critters("bugs", "")) # Execute the SQL check
+        bug_list = list(c.fetchall())
+
+        description_f = ""
+        description_b = ""
+
+        # get a list of all fish available this month
+        critters_availble_list = await self.first_month_critter_filter(fish_list)
+        print("This is a list of all the fish available this month...")
+        for critter in critters_availble_list:
+            description_f = description_f + f"\n{critter}"
+        # get a list of all bugs available this month
+        critters_availble_list = await self.first_month_critter_filter(bug_list)
+        print("This is a list of all the bugs available this month...")
+        for critter in critters_availble_list:
+            description_b = description_b + f"\n{critter}"
+
+        embed_f = discord.Embed(title = "List of Fish arriving this month", description = description_f)
+        embed_b = discord.Embed(title = "List of Bugs arriving this month", description = description_b)
+        await ctx.send(embed = embed_f)
+        await ctx.send(embed = embed_b)
+
+
     @commands.command()
     async def fish(self, ctx, starts_with: typing.Optional[str] = ""):
         """
