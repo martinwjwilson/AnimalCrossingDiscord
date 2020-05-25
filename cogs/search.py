@@ -5,23 +5,18 @@ import sqlite3
 import typing
 from datetime import date
 
-
 # db
 conn = sqlite3.connect("critterpedia.db")
 c = conn.cursor()
-
 
 class Search(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-
     @commands.command(hidden=True)
     @commands.check(utils.check_if_it_is_dev)
     async def test(self, ctx):
         await ctx.send(file=discord.File("ProfessionalRetard.jpg"))
-
-
 
     async def month_list(self, start_month: str, end_month: str):
         """
@@ -55,7 +50,6 @@ class Search(commands.Cog):
             for month in dict_of_all_months:
                 if dict_of_all_months[month] >= start_month_int or dict_of_all_months[month] <= end_month_int:
                     list_of_months_available.append(month)
-
         # check if current month is in list
         return list_of_months_available
 
@@ -67,7 +61,6 @@ class Search(commands.Cog):
         # check if the critter is all year round
         if critter_month.startswith("Year"):
             return True
-
         # get this months month
         current_month = date.today().strftime("%B")
         # print(f"Current month is: {current_month}")
@@ -101,7 +94,6 @@ class Search(commands.Cog):
                 return True
         return False
 
-
     async def this_month_critter_filter(self, list_of_critters: list):
         """
         filters list of all bugs and fish to ones available this month
@@ -120,7 +112,6 @@ class Search(commands.Cog):
                     critters_availble_list.append(critter[0])
         return critters_availble_list
 
-
     @commands.command()
     async def month(self, ctx):
         """
@@ -132,10 +123,8 @@ class Search(commands.Cog):
         # get all bugs
         c.execute(utils.search_all_critters("bugs", "")) # Execute the SQL check
         bug_list = list(c.fetchall())
-
         description_f = ""
         description_b = ""
-
         # get a list of all fish available this month
         critters_availble_list = await self.this_month_critter_filter(fish_list)
         print("This is a list of all the fish available this month...")
@@ -152,7 +141,6 @@ class Search(commands.Cog):
         await ctx.send(embed = embed_f)
         await ctx.send(embed = embed_b)
 
-
     async def final_month_check(self, critter_month: str):
         """
         Check the if this is the last month available for a critter
@@ -162,7 +150,6 @@ class Search(commands.Cog):
         # print(f"Current month is: {current_month}")
         northern_months = critter_month.split("/")[0] # split the critter month into Northern and Southern
         northern_months = northern_months.split("(")[0].strip() # remove the (northern) section
-
         if "," in northern_months: # if critter is available twice a year, split it up
             periods = northern_months.split(",")
             period_1 = periods[0]
@@ -188,7 +175,6 @@ class Search(commands.Cog):
                 return True
         return False
 
-
     async def final_month_critter_filter(self, list_of_critters: list):
         """
         Filters list of all bugs and fish to ones leaving this month
@@ -207,7 +193,6 @@ class Search(commands.Cog):
                     critters_availble_list.append(critter[0])
         return critters_availble_list
 
-
     @commands.command()
     async def leaving(self, ctx):
         """
@@ -219,10 +204,8 @@ class Search(commands.Cog):
         # get all bugs
         c.execute(utils.search_all_critters("bugs", "")) # Execute the SQL check
         bug_list = list(c.fetchall())
-
         description_f = ""
         description_b = ""
-
         # get a list of all fish available this month
         critters_availble_list = await self.final_month_critter_filter(fish_list)
         print("This is a list of all the fish available this month...")
@@ -233,12 +216,10 @@ class Search(commands.Cog):
         print("This is a list of all the bugs available this month...")
         for critter in critters_availble_list:
             description_b = description_b + f"\n{critter}"
-
         embed_f = discord.Embed(title = "List of Fish leaving this month", description = description_f)
         embed_b = discord.Embed(title = "List of Bugs leaving this month", description = description_b)
         await ctx.send(embed = embed_f)
         await ctx.send(embed = embed_b)
-
 
     async def first_month_check(self, critter_month: str):
         """
@@ -249,9 +230,7 @@ class Search(commands.Cog):
         # print(f"Current month is: {current_month}")
         northern_months = critter_month.split("/")[0] # split the critter month into Northern and Southern
         northern_months = northern_months.split("(")[0].strip() # remove the (northern) section
-
         print(f"\nCritter months: {northern_months}")
-
         if "," in northern_months: # if critter is available twice a year, split it up
             periods = northern_months.split(",")
             period_1 = periods[0]
@@ -277,7 +256,6 @@ class Search(commands.Cog):
                 return True
         return False
 
-
     async def first_month_critter_filter(self, list_of_critters: list):
         """
         Filters list of all bugs and fish to ones leaving this month
@@ -296,7 +274,6 @@ class Search(commands.Cog):
                     critters_availble_list.append(critter[0])
         return critters_availble_list
 
-
     @commands.command()
     async def new(self, ctx):
         """
@@ -308,10 +285,8 @@ class Search(commands.Cog):
         # get all bugs
         c.execute(utils.search_all_critters("bugs", "")) # Execute the SQL check
         bug_list = list(c.fetchall())
-
         description_f = ""
         description_b = ""
-
         # get a list of all fish available this month
         critters_availble_list = await self.first_month_critter_filter(fish_list)
         print("This is a list of all the fish available this month...")
@@ -322,12 +297,10 @@ class Search(commands.Cog):
         print("This is a list of all the bugs available this month...")
         for critter in critters_availble_list:
             description_b = description_b + f"\n{critter}"
-
         embed_f = discord.Embed(title = "List of Fish arriving this month", description = description_f)
         embed_b = discord.Embed(title = "List of Bugs arriving this month", description = description_b)
         await ctx.send(embed = embed_f)
         await ctx.send(embed = embed_b)
-
 
     @commands.command()
     async def fish(self, ctx, starts_with: typing.Optional[str] = ""):
@@ -339,7 +312,6 @@ class Search(commands.Cog):
         if starts_with != "":
             starts_with = utils.format_input(starts_with) # format the input
             starts_with = f"WHERE name LIKE '{starts_with}%'" # add sql for search
-
         c.execute(utils.search_all_critters("fish", starts_with)) # Execute the SQL check
         fish_list = list(c.fetchall())
         fish_names = ""
@@ -347,7 +319,6 @@ class Search(commands.Cog):
             fish_names = fish_names + f"{fish[0]}\n"
         embed = discord.Embed(title = "Fish search", description = fish_names)
         await ctx.send(embed = embed)
-
 
     @commands.command()
     async def bug(self, ctx, starts_with: typing.Optional[str] = ""):
@@ -359,7 +330,6 @@ class Search(commands.Cog):
         if starts_with != "":
             starts_with = utils.format_input(starts_with) # format the input
             starts_with = f"WHERE name LIKE '{starts_with}%'" # add sql for search
-
         c.execute(utils.search_all_critters("bugs", starts_with)) # Execute the SQL check
         bug_list = list(c.fetchall())
         bug_names = ""
@@ -367,7 +337,6 @@ class Search(commands.Cog):
             bug_names = bug_names + f"{bug[0]}\n"
         embed = discord.Embed(title = "Bug search", description = bug_names)
         await ctx.send(embed = embed)
-
 
     @commands.command()
     async def s(self, ctx, *, critter_name: str):
@@ -386,7 +355,6 @@ class Search(commands.Cog):
             bug_list = list(c.fetchone())
         except Exception as e:
             pass
-
         # check which one returned a value if any
         critter_list = False
         try:
@@ -399,7 +367,6 @@ class Search(commands.Cog):
             print(bug_list)
         except Exception as e:
             pass
-
         # if there is a match from the DB
         if critter_list:
             # create embed
@@ -422,7 +389,6 @@ class Search(commands.Cog):
             # embed = discord.Embed(title = f'Good job !', description = f"{critter_name} was not in the Critterpedia")
             # embed.set_image(url = 'https://en.meming.world/images/en/thumb/3/3f/Professional_Retard.jpg/300px-Professional_Retard.jpg')
             # await ctx.send(embed = embed)
-
 
 def setup(bot):
     bot.add_cog(Search(bot))

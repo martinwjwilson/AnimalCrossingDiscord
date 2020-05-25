@@ -32,3 +32,6 @@ def search_all_critters(type, starts_with):
                 FROM {type}
                 {starts_with}
                 ORDER BY name ASC"""
+
+# def create_new_profile(villager_name, island_name, friend_code):
+#     return f"""INSERT INTO """
