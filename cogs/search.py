@@ -40,13 +40,11 @@ class Search(commands.Cog):
         list_of_months_available = []
         # if start month is less than end month, include everything greater than start month and less than or = end month
         if start_month_int < end_month_int:
-            # print("THIS 1")
             for month in dict_of_all_months:
                 if dict_of_all_months[month] >= start_month_int and dict_of_all_months[month] <= end_month_int:
                     list_of_months_available.append(month)
         # if end month is less than start month, include everything greater or equal to start month and less than or = end month
         else:
-            # print("THIS 2")
             for month in dict_of_all_months:
                 if dict_of_all_months[month] >= start_month_int or dict_of_all_months[month] <= end_month_int:
                     list_of_months_available.append(month)
@@ -63,7 +61,6 @@ class Search(commands.Cog):
             return True
         # get this months month
         current_month = date.today().strftime("%B")
-        # print(f"Current month is: {current_month}")
         northern_months = critter_month.split("/")[0] # split the critter month into Northern and Southern
         northern_months = northern_months.split("(")[0].strip() # remove the (northern) section
 
@@ -127,12 +124,10 @@ class Search(commands.Cog):
         description_b = ""
         # get a list of all fish available this month
         critters_availble_list = await self.this_month_critter_filter(fish_list)
-        print("This is a list of all the fish available this month...")
         for critter in critters_availble_list:
             description_f = description_f + f"\n{critter}"
         # get a list of all bugs available this month
         critters_availble_list = await self.this_month_critter_filter(bug_list)
-        print("This is a list of all the bugs available this month...")
         for critter in critters_availble_list:
             description_b = description_b + f"\n{critter}"
 
@@ -147,7 +142,6 @@ class Search(commands.Cog):
         """
         # get this months month
         current_month = date.today().strftime("%B")
-        # print(f"Current month is: {current_month}")
         northern_months = critter_month.split("/")[0] # split the critter month into Northern and Southern
         northern_months = northern_months.split("(")[0].strip() # remove the (northern) section
         if "," in northern_months: # if critter is available twice a year, split it up
@@ -208,12 +202,10 @@ class Search(commands.Cog):
         description_b = ""
         # get a list of all fish available this month
         critters_availble_list = await self.final_month_critter_filter(fish_list)
-        print("This is a list of all the fish available this month...")
         for critter in critters_availble_list:
             description_f = description_f + f"\n{critter}"
         # get a list of all bugs available this month
         critters_availble_list = await self.final_month_critter_filter(bug_list)
-        print("This is a list of all the bugs available this month...")
         for critter in critters_availble_list:
             description_b = description_b + f"\n{critter}"
         embed_f = discord.Embed(title = "List of Fish leaving this month", description = description_f)
@@ -227,10 +219,8 @@ class Search(commands.Cog):
         """
         # get this months month
         current_month = date.today().strftime("%B")
-        # print(f"Current month is: {current_month}")
         northern_months = critter_month.split("/")[0] # split the critter month into Northern and Southern
         northern_months = northern_months.split("(")[0].strip() # remove the (northern) section
-        print(f"\nCritter months: {northern_months}")
         if "," in northern_months: # if critter is available twice a year, split it up
             periods = northern_months.split(",")
             period_1 = periods[0]
@@ -289,12 +279,10 @@ class Search(commands.Cog):
         description_b = ""
         # get a list of all fish available this month
         critters_availble_list = await self.first_month_critter_filter(fish_list)
-        print("This is a list of all the fish available this month...")
         for critter in critters_availble_list:
             description_f = description_f + f"\n{critter}"
         # get a list of all bugs available this month
         critters_availble_list = await self.first_month_critter_filter(bug_list)
-        print("This is a list of all the bugs available this month...")
         for critter in critters_availble_list:
             description_b = description_b + f"\n{critter}"
         embed_f = discord.Embed(title = "List of Fish arriving this month", description = description_f)
