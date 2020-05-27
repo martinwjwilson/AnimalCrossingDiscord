@@ -302,21 +302,29 @@ class Search(commands.Cog):
         await ctx.send(embed = embed_f)
         await ctx.send(embed = embed_b)
 
+    async def all_critter_by_species(self, species_type: str, starts_with: str):
+        """
+        Get a list from the database of all critters of a given species
+        Restrict the search to names starting with the 'starts_with' variable if provided
+        """
+        # check if the search should be restricted
+        if starts_with != "":
+            starts_with = utils.format_input(starts_with) # format the input
+            starts_with = f"WHERE name LIKE '{starts_with}%'" # add sql for search
+        c.execute(utils.search_all_critters(species_type, starts_with)) # Execute the SQL check
+        critter_list = list(c.fetchall())
+        critter_names = ""
+        for critter in critter_list:
+            critter_names = critter_names + f"{critter[0]}\n"
+        return critter_names
+
     @commands.command()
     async def fish(self, ctx, starts_with: typing.Optional[str] = ""):
         """
         Display a list of all fish by name
         If input is provided then find names beginning with the input
         """
-        # check if there was a letter
-        if starts_with != "":
-            starts_with = utils.format_input(starts_with) # format the input
-            starts_with = f"WHERE name LIKE '{starts_with}%'" # add sql for search
-        c.execute(utils.search_all_critters("fish", starts_with)) # Execute the SQL check
-        fish_list = list(c.fetchall())
-        fish_names = ""
-        for fish in fish_list:
-            fish_names = fish_names + f"{fish[0]}\n"
+        fish_names = await self.all_critter_by_species("fish", starts_with)
         embed = discord.Embed(title = "Fish search", description = fish_names)
         await ctx.send(embed = embed)
 
@@ -326,15 +334,7 @@ class Search(commands.Cog):
         Display a list of all bugs by name
         If input is provided then find names beginning with the input
         """
-        # check if there was an input
-        if starts_with != "":
-            starts_with = utils.format_input(starts_with) # format the input
-            starts_with = f"WHERE name LIKE '{starts_with}%'" # add sql for search
-        c.execute(utils.search_all_critters("bugs", starts_with)) # Execute the SQL check
-        bug_list = list(c.fetchall())
-        bug_names = ""
-        for bug in bug_list:
-            bug_names = bug_names + f"{bug[0]}\n"
+        bug_names = await self.all_critter_by_species("bugs", starts_with)
         embed = discord.Embed(title = "Bug search", description = bug_names)
         await ctx.send(embed = embed)
 
