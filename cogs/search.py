@@ -345,26 +345,17 @@ class Search(commands.Cog):
         """
         critter_name = utils.format_input(critter_name) # format the input
         # Check both fish and bug tables
+        critter_list = False
         c.execute(utils.check_for_critter("fish", critter_name))
         try:
             fish_list = list(c.fetchone())
+            critter_list = fish_list
         except Exception as e:
             pass
         c.execute(utils.check_for_critter("bugs", critter_name))
         try:
             bug_list = list(c.fetchone())
-        except Exception as e:
-            pass
-        # check which one returned a value if any
-        critter_list = False
-        try:
-            print(fish_list)
-            critter_list = fish_list
-        except Exception as e:
-            pass
-        try:
             critter_list = bug_list
-            print(bug_list)
         except Exception as e:
             pass
         # if there is a match from the DB
@@ -374,21 +365,18 @@ class Search(commands.Cog):
             embed.add_field(name = "Name:", value = critter_list[0], inline = False)
             embed.add_field(name = "Type:", value = critter_list[1], inline = False)
             embed.add_field(name = "Location:", value = critter_list[2], inline = False)
-            if len(critter_list) == 7:
+            if len(critter_list) == 7: # if critter was a fish
                 embed.add_field(name = "Size:", value = critter_list[3], inline = False)
                 embed.add_field(name = "Value:", value = critter_list[4], inline = False)
                 embed.add_field(name = "Time:", value = critter_list[5], inline = False)
                 embed.add_field(name = "Month:", value = critter_list[6], inline = False)
-            else:
+            else: # if critter was a bug
                 embed.add_field(name = "Value:", value = critter_list[3], inline = False)
                 embed.add_field(name = "Time:", value = critter_list[4], inline = False)
                 embed.add_field(name = "Month:", value = critter_list[5], inline = False)
             await ctx.send(embed = embed)
         else:
-            await ctx.send(f"Sorry, {critter_name} is not a valid critter name")
-            # embed = discord.Embed(title = f'Good job !', description = f"{critter_name} was not in the Critterpedia")
-            # embed.set_image(url = 'https://en.meming.world/images/en/thumb/3/3f/Professional_Retard.jpg/300px-Professional_Retard.jpg')
-            # await ctx.send(embed = embed)
+            await ctx.send(f"Sorry, {critter_name} is not a valid critter name\nPlease try using the `bug` or `fish` commands to check your spelling")
 
 def setup(bot):
     bot.add_cog(Search(bot))
