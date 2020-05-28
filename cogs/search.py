@@ -169,14 +169,14 @@ class Search(commands.Cog):
                 return True
         return False
 
-    async def final_month_critter_filter(self, list_of_critters: list):
+    async def final_month_critter_filter(self, list_of_critters: list) -> list:
         """
         Filters list of all bugs and fish to ones leaving this month
         """
         critters_availble_list = [] # list of critters available this month
         # check each critter against the current date
         for critter in list_of_critters:
-            # check if the critter is a fish or a bug
+            # check if the critter is a fish or a bug as db tables are different
             if critter[1] == "Fish":
                 # check availability this month
                 if await self.final_month_check(critter[6]):
@@ -187,29 +187,31 @@ class Search(commands.Cog):
                     critters_availble_list.append(critter[0])
         return critters_availble_list
 
+    async def list_of_critter_leaving(self, species: str) -> str:
+        """
+        Formats and returns a str of all critters of a given species leaving at the end of the current month
+        """
+        # get the full list of species
+        c.execute(utils.search_all_critters(species, ""))
+        all_critter_list = list(c.fetchall())
+        # filter the list to only the ones leaving this month
+        critters_availble_list = await self.final_month_critter_filter(all_critter_list)
+        # convert the list into a string
+        critter_string = ""
+        for critter in critters_availble_list:
+            critter_string = critter_string + f"\n{critter}"
+        # return the finalised string
+        return critter_string
+
     @commands.command()
     async def leaving(self, ctx):
         """
-        Get a list of all fish and bugs leaving at the end of the current month
+        Display a list of all fish and bugs leaving at the end of the current month
         """
-        # get all fish
-        c.execute(utils.search_all_critters("fish", "")) # Execute the SQL check
-        fish_list = list(c.fetchall())
-        # get all bugs
-        c.execute(utils.search_all_critters("bugs", "")) # Execute the SQL check
-        bug_list = list(c.fetchall())
-        description_f = ""
-        description_b = ""
-        # get a list of all fish available this month
-        critters_availble_list = await self.final_month_critter_filter(fish_list)
-        for critter in critters_availble_list:
-            description_f = description_f + f"\n{critter}"
-        # get a list of all bugs available this month
-        critters_availble_list = await self.final_month_critter_filter(bug_list)
-        for critter in critters_availble_list:
-            description_b = description_b + f"\n{critter}"
-        embed_f = discord.Embed(title = "List of Fish leaving this month", description = description_f)
-        embed_b = discord.Embed(title = "List of Bugs leaving this month", description = description_b)
+        # create embeds
+        embed_f = discord.Embed(title = "List of Fish leaving this month", description = await self.list_of_critter_leaving("fish"))
+        embed_b = discord.Embed(title = "List of Bugs leaving this month", description = await self.list_of_critter_leaving("bugs"))
+        # send embeds
         await ctx.send(embed = embed_f)
         await ctx.send(embed = embed_b)
 
