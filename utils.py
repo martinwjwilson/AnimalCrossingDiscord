@@ -1,9 +1,3 @@
-list_of_developers = {
-    "Plugs": 146737110974595073,
-    "RedVelvetUnderground": 449997098956488724
-}
-
-
 # search formatting
 def format_input(input):
     str_input = "".join(input) # join arguments together
@@ -16,6 +10,11 @@ def format_input(input):
 
 
 # check if a developer is using the command
+list_of_developers = {
+"Plugs": 146737110974595073,
+"RedVelvetUnderground": 449997098956488724
+}
+
 def check_if_it_is_dev(ctx):
     if ctx.message.author.id in list_of_developers.values():
         return True

@@ -18,6 +18,18 @@ class Search(commands.Cog):
     async def test(self, ctx):
         await ctx.send(file=discord.File("ProfessionalRetard.jpg"))
 
+    async def format_input(self, input):
+        """
+        Format a string to match the style of the db entries
+        """
+        str_input = "".join(input) # join arguments together
+        # fix casing
+        word_list = str_input.lower().split(" ") # split each word by space and make lowercase
+        output = []
+        for word in word_list:
+            output.append(word.capitalize()) # capitalise all lowercase words in list
+        return " ".join(output) # join words back together with a space between them
+
     async def month_list(self, start_month: str, end_month: str):
         """
         Return a list of months from the start month until the end month
@@ -299,7 +311,7 @@ class Search(commands.Cog):
         """
         # check if the search should be restricted
         if starts_with != "":
-            starts_with = utils.format_input(starts_with) # format the input
+            starts_with = await self.format_input(starts_with) # format the input
             starts_with = f"WHERE name LIKE '{starts_with}%'" # add sql for search
         c.execute(utils.search_all_critters(species_type, starts_with)) # Execute the SQL check
         critter_list = list(c.fetchall())
@@ -333,7 +345,7 @@ class Search(commands.Cog):
         """
         Search for a critter by name and display all of its information
         """
-        critter_name = utils.format_input(critter_name) # format the input
+        critter_name = await self.format_input(critter_name) # format the input
         # Check both fish and bug tables
         critter_list = False
         c.execute(utils.check_for_critter("fish", critter_name))
