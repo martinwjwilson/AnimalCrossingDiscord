@@ -182,25 +182,6 @@ class Search(commands.Cog):
                 return True
         return False
 
-    async def first_month_critter_filter(self, list_of_critters: list) -> list:
-        """
-        Filters list of all bugs and fish to ones arriving this month
-        """
-        critters_available_list = [] # list of critters available this month
-        # check each critter against the current date
-        for critter in list_of_critters:
-            # check if the critter is a fish or a bug as db tables are different
-            if critter[1] == "Fish":
-                # check availability this month
-                if await self.first_month_check(critter[6]):
-                    critters_available_list.append(critter[0])
-            else:
-                # check availability this month
-                if await self.first_month_check(critter[5]):
-                    critters_available_list.append(critter[0])
-                    return critters_available_list
-        return critters_available_list
-
     async def final_month_check(self, critter_month: str) -> bool:
         """
         Check the if this is the last month available for a critter
@@ -235,22 +216,28 @@ class Search(commands.Cog):
                 return True
         return False
 
-    async def final_month_critter_filter(self, list_of_critters: list) -> list:
+    async def critter_filter_by_changing(self, list_of_critters: list, change_type: str) -> list:
         """
-        Filters list of all bugs and fish to ones leaving this month
+        Filters list of all bugs and fish to ones arriving or leaving this month
         """
         critters_available_list = [] # list of critters available this month
         # check each critter against the current date
         for critter in list_of_critters:
             # check if the critter is a fish or a bug as db tables are different
             if critter[1] == "Fish":
-                # check availability this month
-                if await self.final_month_check(critter[6]):
-                    critters_available_list.append(critter[0])
+                if change_type == "arriving": # if the check is 'arriving'
+                    if await self.first_month_check(critter[6]):
+                        critters_available_list.append(critter[0])
+                elif change_type == "leaving": # if the check is 'leaving'
+                    if await self.final_month_check(critter[6]):
+                        critters_available_list.append(critter[0])
             else:
-                # check availability this month
-                if await self.final_month_check(critter[5]):
-                    critters_available_list.append(critter[0])
+                if change_type == "arriving": # if the check is 'arriving'
+                    if await self.first_month_check(critter[5]):
+                        critters_available_list.append(critter[0])
+                elif change_type == "leaving": # if the check is 'leaving'
+                    if await self.final_month_check(critter[5]):
+                        critters_available_list.append(critter[0])
         return critters_available_list
 
     async def list_of_critter_changing(self, species: str, change_type: str) -> str:
@@ -262,10 +249,10 @@ class Search(commands.Cog):
         all_critter_list = list(c.fetchall())
         # check if arriving or leaving command was called
         if change_type == "arriving":
-            critters_available_list = await self.first_month_critter_filter(all_critter_list)
+            critters_available_list = await self.critter_filter_by_changing(all_critter_list, change_type)
             # print("The critter_available_list is " + critters_available_list)
         elif change_type == "leaving":
-            critters_available_list = await self.final_month_critter_filter(all_critter_list)
+            critters_available_list = await self.critter_filter_by_changing(all_critter_list, change_type)
         # convert the list into a string
         critter_string = ""
         for critter in critters_available_list:
