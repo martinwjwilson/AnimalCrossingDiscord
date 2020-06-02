@@ -216,6 +216,53 @@ class Search(commands.Cog):
                 return True
         return False
 
+    async def critter_available_twice_per_year(self, current_month: str, critter_months: str, change_type: str) -> bool:
+        periods = critter_months.split(",")
+        period_1 = periods[0]
+        period_2 = periods[1]
+        if((await self.critter_available_once_per_year(current_month, period_1, change_type)) or (await self.critter_available_once_per_year(current_month, period_2, change_type))):
+            return True
+        else:
+            return False
+
+    async def critter_available_once_per_year(self, current_month: str, critter_months: str, change_type: str) -> bool:
+        # get start and end months
+        print(critter_months)
+        start_month, end_month = critter_months.split("-")
+        # check change type
+        if change_type == "arriving":
+            if current_month == start_month:
+                return True
+            else:
+                return False
+        elif change_type == "leaving":
+            if current_month == end_month:
+                return True
+            else:
+                return False
+
+    async def critter_fits_change_check(self, critter_month: str, change_type: str) -> bool:
+        """
+        Check if a critter follows the change being checked against
+        Return a bool representing if the critter does or doesn't follow the change
+        e.g. a critter leaves in June and the check is for all critters leaving in June. Return True
+        """
+        # get the current momnth in the desired format
+        current_month = date.today().strftime("%B")
+        critter_both_months = critter_month.split("/")[0] # split the critter month into Northern and Southern
+        critter_northern_months = critter_both_months.split("(")[0].strip() # keep only the Northern month
+        # check if the current month matches the critter availability
+        # Northern
+        if "," in critter_northern_months: # if critter is available in two periods per year
+            return await self.critter_available_twice_per_year(current_month, critter_northern_months, change_type)
+        elif "-" in critter_northern_months: # there is one period per year
+            return await self.critter_available_once_per_year(current_month, critter_northern_months, change_type)
+        elif current_month == critter_northern_months: # critter is available one month of the year
+            return True
+        return False
+        # Southern
+
+
     async def critter_filter_by_changing(self, list_of_critters: list, change_type: str) -> list:
         """
         Filters list of all bugs and fish to ones arriving or leaving this month
@@ -225,19 +272,12 @@ class Search(commands.Cog):
         for critter in list_of_critters:
             # check if the critter is a fish or a bug as db tables are different
             if critter[1] == "Fish":
-                if change_type == "arriving": # if the check is 'arriving'
-                    if await self.first_month_check(critter[6]):
-                        critters_available_list.append(critter[0])
-                elif change_type == "leaving": # if the check is 'leaving'
-                    if await self.final_month_check(critter[6]):
-                        critters_available_list.append(critter[0])
+                if await self.critter_fits_change_check(critter[6], change_type):
+                    critters_available_list.append(critter[0])
             else:
-                if change_type == "arriving": # if the check is 'arriving'
-                    if await self.first_month_check(critter[5]):
-                        critters_available_list.append(critter[0])
-                elif change_type == "leaving": # if the check is 'leaving'
-                    if await self.final_month_check(critter[5]):
-                        critters_available_list.append(critter[0])
+                print(critter[0])
+                if await self.critter_fits_change_check(critter[5], change_type):
+                    critters_available_list.append(critter[0])
         return critters_available_list
 
     async def list_of_critter_changing(self, species: str, change_type: str) -> str:
