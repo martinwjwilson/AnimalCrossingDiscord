@@ -148,74 +148,6 @@ class Search(commands.Cog):
         await ctx.send(embed = embed_f)
         await ctx.send(embed = embed_b)
 
-    async def first_month_check(self, critter_month: str) -> bool:
-        """
-        Check the if this is the first month available for a critter
-        Return bool value representing the result
-        """
-        # get this months month
-        current_month = date.today().strftime("%B")
-        northern_months = critter_month.split("/")[0] # split the critter month into Northern and Southern
-        northern_months = northern_months.split("(")[0].strip() # remove the (northern) section
-        if "," in northern_months: # if critter is available twice a year, split it up
-            periods = northern_months.split(",")
-            period_1 = periods[0]
-            period_2 = periods[1]
-            # get start and end months from each period
-            period_1 = period_1.split("-")
-            start_month_1 = period_1[0].strip()
-            if "-" in period_2:
-                period_2 = period_2.split("-")
-            else: # if it's a ladybug... :v
-                period_2 = [period_2, period_2]
-            start_month_2 = period_2[0].strip()
-            if((current_month == start_month_1) or (current_month == start_month_2)):
-                return True
-        elif "-" in northern_months: # there is one period per year
-            # get start and end months
-            start_month, end_month = northern_months.split("-")
-            # generate a list of months critter is available
-            if current_month == start_month:
-                return True
-        else: # it is available for a single month per year
-            if current_month == northern_months:
-                return True
-        return False
-
-    async def final_month_check(self, critter_month: str) -> bool:
-        """
-        Check the if this is the last month available for a critter
-        Return bool value representing the result
-        """
-        # get this months month
-        current_month = date.today().strftime("%B")
-        northern_months = critter_month.split("/")[0] # split the critter month into Northern and Southern
-        northern_months = northern_months.split("(")[0].strip() # remove the (northern) section
-        if "," in northern_months: # if critter is available twice a year, split it up
-            periods = northern_months.split(",")
-            period_1 = periods[0]
-            period_2 = periods[1]
-            # get start and end months from each period
-            period_1 = period_1.split("-")
-            end_month_1 = period_1[1].strip()
-            if "-" in period_2:
-                period_2 = period_2.split("-")
-            else: # if it's a ladybug... :v
-                period_2 = [period_2, period_2]
-            end_month_2 = period_2[1].strip()
-            if((current_month == end_month_1) or (current_month == end_month_2)):
-                return True
-        elif "-" in northern_months: # there is one period per year
-            # get start and end months
-            start_month, end_month = northern_months.split("-")
-            # generate a list of months critter is available
-            if current_month == end_month:
-                return True
-        else: # it is available for a single month per year
-            if current_month == northern_months:
-                return True
-        return False
-
     async def critter_available_twice_per_year(self, current_month: str, critter_months: str, change_type: str) -> bool:
         periods = critter_months.split(",")
         period_1 = periods[0]
@@ -261,7 +193,6 @@ class Search(commands.Cog):
             return True
         return False
         # Southern
-
 
     async def critter_filter_by_changing(self, list_of_critters: list, change_type: str) -> list:
         """
