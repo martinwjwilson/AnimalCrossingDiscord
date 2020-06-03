@@ -159,7 +159,6 @@ class Search(commands.Cog):
 
     async def critter_available_once_per_year(self, current_month: str, critter_months: str, change_type: str) -> bool:
         # get start and end months
-        print(critter_months)
         start_month, end_month = critter_months.split("-")
         # check change type
         if change_type == "arriving":
@@ -173,7 +172,7 @@ class Search(commands.Cog):
             else:
                 return False
 
-    async def critter_fits_change_check(self, critter_month: str, change_type: str) -> bool:
+    async def critter_fits_change_check(self, critter_month: str, change_type: str, hemisphere: str) -> bool:
         """
         Check if a critter follows the change being checked against
         Return a bool representing if the critter does or doesn't follow the change
@@ -181,20 +180,30 @@ class Search(commands.Cog):
         """
         # get the current momnth in the desired format
         current_month = date.today().strftime("%B")
-        critter_both_months = critter_month.split("/")[0] # split the critter month into Northern and Southern
-        critter_northern_months = critter_both_months.split("(")[0].strip() # keep only the Northern month
+        if critter_month == "Year-round (Northern and Southern)": # check if the critter is available all year
+            return False
+        critter_northern_period, critter_southern_period = critter_month.split("/") # split the critter month into Northern and Southern
+        critter_northern_months = critter_northern_period.split("(")[0].strip() # remove the word Northern
+        critter_southern_months = critter_southern_period.split("(")[0].strip()# remove the word Southern
         # check if the current month matches the critter availability
-        # Northern
-        if "," in critter_northern_months: # if critter is available in two periods per year
-            return await self.critter_available_twice_per_year(current_month, critter_northern_months, change_type)
-        elif "-" in critter_northern_months: # there is one period per year
-            return await self.critter_available_once_per_year(current_month, critter_northern_months, change_type)
-        elif current_month == critter_northern_months: # critter is available one month of the year
-            return True
-        return False
-        # Southern
+        if hemisphere == "n": # Northern
+            if "," in critter_northern_months: # if critter is available in two periods per year
+                return await self.critter_available_twice_per_year(current_month, critter_northern_months, change_type)
+            elif "-" in critter_northern_months: # there is one period per year
+                return await self.critter_available_once_per_year(current_month, critter_northern_months, change_type)
+            elif current_month == critter_northern_months: # critter is available one month of the year
+                return True
+            return False
+        elif hemisphere == "s": # Southern
+            if "," in critter_southern_months: # if critter is available in two periods per year
+                return await self.critter_available_twice_per_year(current_month, critter_southern_months, change_type)
+            elif "-" in critter_southern_months: # there is one period per year
+                return await self.critter_available_once_per_year(current_month, critter_southern_months, change_type)
+            elif current_month == critter_southern_months: # critter is available one month of the year
+                return True
+            return False
 
-    async def critter_filter_by_changing(self, list_of_critters: list, change_type: str) -> list:
+    async def critter_filter_by_changing(self, list_of_critters: list, change_type: str, hemisphere: str) -> list:
         """
         Filters list of all bugs and fish to ones arriving or leaving this month
         """
@@ -203,15 +212,14 @@ class Search(commands.Cog):
         for critter in list_of_critters:
             # check if the critter is a fish or a bug as db tables are different
             if critter[1] == "Fish":
-                if await self.critter_fits_change_check(critter[6], change_type):
+                if await self.critter_fits_change_check(critter[6], change_type, hemisphere):
                     critters_available_list.append(critter[0])
             else:
-                print(critter[0])
-                if await self.critter_fits_change_check(critter[5], change_type):
+                if await self.critter_fits_change_check(critter[5], change_type, hemisphere):
                     critters_available_list.append(critter[0])
         return critters_available_list
 
-    async def list_of_critter_changing(self, species: str, change_type: str) -> str:
+    async def list_of_critter_changing(self, species: str, change_type: str, hemisphere: str) -> str:
         """
         Formats and returns a str of all critters of a given species leaving or arriving depending on the command called
         """
@@ -220,10 +228,9 @@ class Search(commands.Cog):
         all_critter_list = list(c.fetchall())
         # check if arriving or leaving command was called
         if change_type == "arriving":
-            critters_available_list = await self.critter_filter_by_changing(all_critter_list, change_type)
-            # print("The critter_available_list is " + critters_available_list)
+            critters_available_list = await self.critter_filter_by_changing(all_critter_list, change_type, hemisphere)
         elif change_type == "leaving":
-            critters_available_list = await self.critter_filter_by_changing(all_critter_list, change_type)
+            critters_available_list = await self.critter_filter_by_changing(all_critter_list, change_type, hemisphere)
         # convert the list into a string
         critter_string = ""
         for critter in critters_available_list:
@@ -231,28 +238,34 @@ class Search(commands.Cog):
         # return the finalised string
         return critter_string
 
-    @commands.command()
-    async def arriving(self, ctx):
+    async def arriving_or_leaving(self, ctx, change_type: str, hemisphere: str):
         """
         Display a list of all fish and bugs arriving in the current month
         """
-        embed_f = discord.Embed(title = "List of Fish leaving this month", description = await self.list_of_critter_changing("fish", "arriving"))
-        embed_b = discord.Embed(title = "List of Bugs leaving this month", description = await self.list_of_critter_changing("bugs", "arriving"))
+        # check that hemisphere is valid
+        if hemisphere != "n" and hemisphere != "s":
+            await ctx.send("Invalid hemisphere. Must be either `n` or `s`. (No input will default to `n`)")
+            return
+        # create embeds
+        embed_f = discord.Embed(title = "List of Fish leaving this month", description = await self.list_of_critter_changing("fish", change_type, hemisphere))
+        embed_b = discord.Embed(title = "List of Bugs leaving this month", description = await self.list_of_critter_changing("bugs", change_type, hemisphere))
         # send embeds
         await ctx.send(embed = embed_f)
         await ctx.send(embed = embed_b)
 
     @commands.command()
-    async def leaving(self, ctx):
+    async def arriving(self, ctx, hemisphere: typing.Optional[str] = "n"):
+        """
+        Display a list of all fish and bugs arriving in the current month
+        """
+        await self.arriving_or_leaving(ctx, "arriving", hemisphere)
+
+    @commands.command()
+    async def leaving(self, ctx, hemisphere: typing.Optional[str] = "n"):
         """
         Display a list of all fish and bugs leaving at the end of the current month
         """
-        # create embeds
-        embed_f = discord.Embed(title = "List of Fish leaving this month", description = await self.list_of_critter_changing("fish", "leaving"))
-        embed_b = discord.Embed(title = "List of Bugs leaving this month", description = await self.list_of_critter_changing("bugs", "leaving"))
-        # send embeds
-        await ctx.send(embed = embed_f)
-        await ctx.send(embed = embed_b)
+        await self.arriving_or_leaving(ctx, "leaving", hemisphere)
 
     async def all_critter_by_species(self, species_type: str, starts_with: str):
         """
