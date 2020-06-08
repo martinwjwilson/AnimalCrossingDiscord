@@ -330,11 +330,16 @@ class Search(commands.Cog):
             embed.add_field(name = "Name:", value = critter_list[0], inline = False)
             embed.add_field(name = "Type:", value = critter_list[1], inline = False)
             embed.add_field(name = "Location:", value = critter_list[2], inline = False)
-            if len(critter_list) == 7: # if critter was a fish
+            print(critter_list[1])
+            if critter_list[1] == 'Fish': # if critter was a fish
                 embed.add_field(name = "Size:", value = critter_list[3], inline = False)
                 embed.add_field(name = "Value:", value = critter_list[4], inline = False)
                 embed.add_field(name = "Time:", value = critter_list[5], inline = False)
                 embed.add_field(name = "Month:", value = critter_list[6], inline = False)
+                print(critter_list[5])
+                print(critter_list[6])
+                print(critter_list[7])
+                embed.set_image(url = critter_list[7])
             else: # if critter was a bug
                 embed.add_field(name = "Value:", value = critter_list[3], inline = False)
                 embed.add_field(name = "Time:", value = critter_list[4], inline = False)
