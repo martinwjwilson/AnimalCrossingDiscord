@@ -4,7 +4,7 @@ import json
 import utils
 
 # load cogs
-bot = commands.Bot(command_prefix = ">")
+bot = commands.Bot(command_prefix = ">", help_command = None)
 extensions = ["admin", "search"] # list of cogs to call
 
 # laod bot token
@@ -17,6 +17,14 @@ async def on_ready():
     print(f"{bot.user.name} - {bot.user.id}") # name of bot and ID
     print(discord.__version__) # current version of discord
     print("Ready...")
+
+
+@bot.command()
+async def help(ctx):
+    embed = discord.Embed(title = "Command List", description = "Here are all of the bot commands!\nFor information on using a specific command, use `>help {command}`")
+    embed.add_field(name = "Main:", value = "command1\ncommand2", inline = False)
+    embed.add_field(name = "Support the bot!", value = "*{inset_link_here}*", inline = False)
+    await ctx.send(embed = embed)
 
 
 # immediately stop the bot
