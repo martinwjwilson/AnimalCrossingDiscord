@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import json
 import utils
+import typing
 
 # load cogs
 bot = commands.Bot(command_prefix = ">", help_command = None)
@@ -20,9 +21,26 @@ async def on_ready():
 
 
 @bot.command()
-async def help(ctx):
-    embed = discord.Embed(title = "Command List", description = "Here are all of the bot commands!\nFor information on using a specific command, use `>help {command}`")
-    embed.add_field(name = "Main:", value = "command1\ncommand2", inline = False)
+async def help(ctx, command_name: typing.Optional[str] = ""):
+    """
+    Custom help messages for each command
+    """
+    if command_name == "":
+        embed = discord.Embed(title = "Command List", description = "Here are all of the bot commands!\nFor information on using a specific command, use `>help {command}`")
+        embed.add_field(name = "Search:", value = "s\nfish\nbug\nmonth\narriving\nleaving", inline = False)
+    elif command_name == "s":
+        embed = discord.Embed(title = ">s critter_name", description = "Search for a critter by name and display all related information")
+        embed.add_field(name = "Example", value = "`>s bitterling` would return all of the details about the bitterling such as size, value, etc.", inline = False)
+    elif command_name == "fish":
+        embed = discord.Embed(title = "null:", description = "null")
+    elif command_name == "bug":
+        embed = discord.Embed(title = "null:", description = "null")
+    elif command_name == "month":
+        embed = discord.Embed(title = "null:", description = "null")
+    elif command_name == "arriving":
+        embed = discord.Embed(title = "null:", description = "null")
+    elif command_name == "leaving":
+        embed = discord.Embed(title = "null:", description = "null")
     embed.add_field(name = "Support the bot!", value = "*{inset_link_here}*", inline = False)
     await ctx.send(embed = embed)
 
