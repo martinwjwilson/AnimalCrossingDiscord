@@ -12,13 +12,11 @@ extensions = ["admin", "search"] # list of cogs to call
 with open("token.json", 'r') as f:
     token = json.load(f)['TOKEN']
 
-
 @bot.event
 async def on_ready():
     print(f"{bot.user.name} - {bot.user.id}") # name of bot and ID
     print(discord.__version__) # current version of discord
     print("Ready...")
-
 
 @bot.command()
 async def help(ctx, command_name: typing.Optional[str] = ""):
@@ -53,13 +51,11 @@ async def help(ctx, command_name: typing.Optional[str] = ""):
     embed.add_field(name = "Support the bot!", value = "*https://ko-fi.com/plugs*", inline = False)
     await ctx.send(embed = embed)
 
-
 # immediately stop the bot
 @bot.command(hidden = True)
 @commands.check(utils.check_if_it_is_dev)
 async def stop(ctx):
     await bot.logout() # log the bot off
-
 
 # manually load a cog
 @bot.command(hidden = True)
@@ -71,7 +67,6 @@ async def load(ctx, extension):
     except Exception as error:
         print(f"{extension} could not be loaded. [{error}]")
 
-
 # manually unload a cog
 @bot.command(hidden = True)
 @commands.check(utils.check_if_it_is_dev)
@@ -81,7 +76,6 @@ async def unload(ctx, extension):
         print(f"Unloaded {extension}.\n")
     except Exception as error:
         print(f"{extension} could not be unloaded. [{error}]")
-
 
 # manually reload a cog
 @bot.command(hidden = True)
