@@ -152,7 +152,7 @@ for fish in fish_list:
 # convert each bug into a critter
 for bug in bug_list:
     # get the time periods
-    bug_time = bug[5]
+    bug_time = bug[4]
     if bug_time == "All day":
         bug_time = "12 a.m. - 12 a.m."
     # fix case for 2 time periods
@@ -165,7 +165,7 @@ for bug in bug_list:
             temp_list.append(time)
 
     # get the month periods
-    bug_dates = bug[6]
+    bug_dates = bug[5]
     start_date_second = None
     end_date_second = None
 
@@ -180,7 +180,7 @@ for bug in bug_list:
             start_date = bug_dates
             end_date = bug_dates
         # check if only one period
-    elif "," not in bug_dates:
+        elif "," not in bug_dates:
             both_dates = get_month_start_end(bug_dates)
             start_date = both_dates[0]
             end_date = both_dates[1]
@@ -193,7 +193,7 @@ for bug in bug_list:
             start_date_second = both_dates_second[0]
             end_date_second = both_dates_second[1]
 
-    # convert the fish properties ready to fit critter class
+    # convert the bug properties ready to fit critter class
     bug_name = bug[0]
     bug_species = bug[1]
     bug_location = bug[2]
@@ -201,19 +201,18 @@ for bug in bug_list:
     bug_value = bug[3]
     bug_start_time_period_1 = temp_list[0]
     bug_end_time_period_1 = temp_list[1]
+    bug_start_time_period_2 = None
+    bug_end_time_period_2 = None
     if len(temp_list) == 4:
         bug_start_time_period_2 = temp_list[2]
         bug_end_time_period_2 = temp_list[3]
-    else:
-        bug_start_time_period_2 = None
-        bug_end_time_period_2 = None
     bug_start_month = start_date
     bug_end_month = end_date
     bug_start_month_period_2 = start_date_second
     bug_end_month_period_2 = end_date_second
-    bug_image_url = bug[7]
+    bug_image_url = bug[6]
 
-    # convert fish into critter
+    # convert bug into critter
     critter = Critter(
         bug_name,
         bug_size,
