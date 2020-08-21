@@ -83,8 +83,8 @@ for fish in fish_list:
 
     # get the month periods
     fish_dates = fish[6]
-    start_date_second = "null"
-    end_date_second = "null"
+    start_date_second = None
+    end_date_second = None
 
     if "round" in fish_dates:
         start_date = "All Year"
@@ -147,7 +147,6 @@ for fish in fish_list:
         fish_end_month_period_2,
         fish_image_url)
 
-    print(critter.start_month_second)
     insert_critter_into_db(critter)
 
 # convert each bug into a critter
@@ -167,8 +166,8 @@ for bug in bug_list:
 
     # get the month periods
     bug_dates = bug[6]
-    start_date_second = "null"
-    end_date_second = "null"
+    start_date_second = None
+    end_date_second = None
 
     if "round" in bug_dates:
         start_date = "All Year"
@@ -198,8 +197,8 @@ for bug in bug_list:
     bug_name = bug[0]
     bug_species = bug[1]
     bug_location = bug[2]
-    bug_size = bug[3]
-    bug_value = bug[4]
+    bug_size = None
+    bug_value = bug[3]
     bug_start_time_period_1 = temp_list[0]
     bug_end_time_period_1 = temp_list[1]
     if len(temp_list) == 4:
@@ -231,5 +230,4 @@ for bug in bug_list:
         bug_end_month_period_2,
         bug_image_url)
 
-    print(critter.start_month_second)
     insert_critter_into_db(critter)
