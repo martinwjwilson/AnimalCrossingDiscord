@@ -64,7 +64,38 @@ def get_month_start_end(month_string: str) -> list:
     return return_list
 
 def insert_critter_into_db(critter_to_insert):
-    pass
+    critter_sql = f"""INSERT INTO critter
+                        (critter_name,
+                        species,
+                        location,
+                        size,
+                        value,
+                        start_time,
+                        end_time,
+                        alt_start_time,
+                        alt_end_time,
+                        start_month,
+                        end_month,
+                        alt_start_month,
+                        alt_end_month,
+                        image_url)
+                        VALUES
+                        ('{critter_to_insert.critter_name}',
+                        '{critter_to_insert.species}',
+                        '{critter_to_insert.location}',
+                        '{critter_to_insert.size}',
+                        '{critter_to_insert.value}',
+                        '{critter_to_insert.start_time}',
+                        '{critter_to_insert.end_time}',
+                        '{critter_to_insert.start_time_second}',
+                        '{critter_to_insert.end_time_second}',
+                        '{critter_to_insert.start_month}',
+                        '{critter_to_insert.end_month}',
+                        '{critter_to_insert.start_month_second}',
+                        '{critter_to_insert.end_month_second}',
+                        '{critter_to_insert.image_url}');"""
+
+    print(critter_sql)
 
 # convert each fish into a critter
 for fish in fish_list:
@@ -133,7 +164,7 @@ for fish in fish_list:
     # convert fish into critter
     critter = Critter(
         fish_name,
-        fish_size,
+        fish_species,
         fish_location,
         fish_size,
         fish_value,
@@ -215,7 +246,7 @@ for bug in bug_list:
     # convert bug into critter
     critter = Critter(
         bug_name,
-        bug_size,
+        bug_species,
         bug_location,
         bug_size,
         bug_value,
