@@ -95,7 +95,14 @@ def insert_critter_into_db(critter_to_insert):
                         '{critter_to_insert.end_month_second}',
                         '{critter_to_insert.image_url}');"""
 
-    print(critter_sql)
+    # print(critter_sql)
+    # execute sql
+    conn = sqlite3.connect("..\..\\ailurus.db")
+    cc = conn.cursor()
+
+    # get list of all fish
+    cc.execute(critter_sql)
+    conn.commit()
 
 # convert each fish into a critter
 for fish in fish_list:
