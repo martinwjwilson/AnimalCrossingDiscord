@@ -6,7 +6,7 @@ import typing
 from datetime import date
 
 # db
-conn = sqlite3.connect("critterpedia.db")
+conn = sqlite3.connect("ailurus.db")
 c = conn.cursor()
 
 class Search(commands.Cog):
@@ -16,7 +16,7 @@ class Search(commands.Cog):
     @commands.command(hidden=True)
     @commands.check(utils.check_if_it_is_dev)
     async def test(self, ctx):
-        await ctx.send(file=discord.File("ProfessionalRetard.jpg"))
+        await ctx.send("this is a test")
 
     async def format_input(self, input):
         """
@@ -308,29 +308,20 @@ class Search(commands.Cog):
         """
         Search for a critter by name and display all of its information
         """
-        critter_name = await self.format_input(critter_name) # format the input
-        # Check both fish and bug tables
+        critter_name = await self.format_input(critter_name) # alter the user input to match the db format
+        # Check the critter table to see if any of the critter names match the user input
         critter_list = False
-        c.execute(utils.check_for_critter("fish", critter_name))
+        c.execute(utils.check_for_critter(critter_name))
         try:
-            fish_list = list(c.fetchone())
-            critter_list = fish_list
+            critter_list = list(c.fetchone())
         except Exception as e:
             pass
-        c.execute(utils.check_for_critter("bugs", critter_name))
-        try:
-            bug_list = list(c.fetchone())
-            critter_list = bug_list
-        except Exception as e:
-            pass
-        # if there is a match from the DB
-        if critter_list:
+        if critter_list: # if there is a match from the DB
             # create embed
             embed = discord.Embed(title = f'{critter_list[1]} Info', description = f"Everything you need to know about the {critter_list[0]}")
             embed.add_field(name = "Name:", value = critter_list[0], inline = False)
             embed.add_field(name = "Type:", value = critter_list[1], inline = False)
             embed.add_field(name = "Location:", value = critter_list[2], inline = False)
-            print(critter_list[1])
             if critter_list[1] == 'Fish': # if critter was a fish
                 embed.add_field(name = "Size:", value = critter_list[3], inline = False)
                 embed.add_field(name = "Value:", value = critter_list[4], inline = False)
@@ -344,7 +335,7 @@ class Search(commands.Cog):
                 embed.set_image(url = critter_list[6])
             await ctx.send(embed = embed)
         else:
-            await ctx.send(f"Sorry, {critter_name} is not a valid critter name\nPlease try using the `bug` or `fish` commands to check your spelling")
+            await ctx.send(f"Sorry, {critter_name} is not a valid critter name\nPlease try using the `bug` or `fish` commands to check your spelling against the listed species")
 
 def setup(bot):
     bot.add_cog(Search(bot))
