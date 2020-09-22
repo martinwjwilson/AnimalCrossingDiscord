@@ -10,7 +10,7 @@ def check_if_it_is_dev(ctx):
 
 
 # SQL STATEMENTS
-def check_for_critter(type, name):
+def check_for_critter(name):
     return f"""SELECT *
                 FROM critter
                 WHERE critter_name = '{name}'"""
