@@ -4,6 +4,7 @@ import utils
 import sqlite3
 import typing
 from datetime import date
+from critter import Critter
 
 # db
 conn = sqlite3.connect("ailurus.db")
@@ -313,26 +314,24 @@ class Search(commands.Cog):
         critter_list = False
         c.execute(utils.check_for_critter(critter_name))
         try:
-            critter_list = list(c.fetchone())
+            critter = list(c.fetchone())
+            # create a new critter instance
+            critter = Critter(critter[0], critter[1], critter[2], critter[3], critter[4], critter[5], critter[6], critter[7], critter[8], critter[9], critter[10], critter[11], critter[12], critter[13])
         except Exception as e:
             pass
-        if critter_list: # if there is a match from the DB
+        if critter: # if there is a match from the DB
             # create embed
-            embed = discord.Embed(title = f'{critter_list[1]} Info', description = f"Everything you need to know about the {critter_list[0]}")
-            embed.add_field(name = "Name:", value = critter_list[0], inline = False)
-            embed.add_field(name = "Type:", value = critter_list[1], inline = False)
-            embed.add_field(name = "Location:", value = critter_list[2], inline = False)
-            if critter_list[1] == 'Fish': # if critter was a fish
-                embed.add_field(name = "Size:", value = critter_list[3], inline = False)
-                embed.add_field(name = "Value:", value = critter_list[4], inline = False)
-                embed.add_field(name = "Time:", value = critter_list[5], inline = False)
-                embed.add_field(name = "Month:", value = critter_list[6], inline = False)
-                embed.set_image(url = critter_list[7])
-            else: # if critter was a bug
-                embed.add_field(name = "Value:", value = critter_list[3], inline = False)
-                embed.add_field(name = "Time:", value = critter_list[4], inline = False)
-                embed.add_field(name = "Month:", value = critter_list[5], inline = False)
-                embed.set_image(url = critter_list[6])
+            critter.get_critter_time_period()
+            embed = discord.Embed(title = f'{critter.name} Info', description = f"Everything you need to know about the {critter.name}")
+            embed.add_field(name = "Name:", value = critter.name, inline = False)
+            embed.add_field(name = "Type:", value = critter.species, inline = False)
+            embed.add_field(name = "Location:", value = critter.location, inline = False)
+            if critter.species == 'Fish': # if critter was a fish
+                embed.add_field(name = "Size:", value = critter.size, inline = False)
+            embed.add_field(name = "Value:", value = critter.value, inline = False)
+            embed.add_field(name = "Time:", value = f"{critter.start_time} - {critter.end_time}", inline = False)
+            embed.add_field(name = "Month:", value = f"{critter.start_month} - {critter.end_month}", inline = False)
+            embed.set_image(url = critter.image_url)
             await ctx.send(embed = embed)
         else:
             await ctx.send(f"Sorry, {critter_name} is not a valid critter name\nPlease try using the `bug` or `fish` commands to check your spelling against the listed species")
