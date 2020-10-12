@@ -17,9 +17,10 @@ def check_for_critter(name):
 
 def search_all_critters(type, starts_with):
     return f"""SELECT *
-                FROM {type}
+                FROM critter
+                WHERE species = '{type}'
                 {starts_with}
-                ORDER BY name ASC"""
+                ORDER BY critter_name ASC"""
 
 # def create_new_profile(villager_name, island_name, friend_code):
 #     return f"""INSERT INTO """
