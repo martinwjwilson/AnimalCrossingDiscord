@@ -10,10 +10,10 @@ def check_if_it_is_dev(ctx):
 
 
 # SQL STATEMENTS
-def check_for_critter(type, name):
+def check_for_critter(name):
     return f"""SELECT *
-                FROM {type}
-                WHERE name = '{name}'"""
+                FROM critter
+                WHERE critter_name = '{name}'"""
 
 def search_all_critters(type, starts_with):
     return f"""SELECT *
