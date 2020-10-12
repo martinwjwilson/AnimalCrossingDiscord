@@ -268,41 +268,41 @@ class Search(commands.Cog):
     #     """
     #     await self.arriving_or_leaving(ctx, "leaving", hemisphere)
 
-    # async def all_critter_by_species(self, species_type: str, starts_with: str):
-    #     """
-    #     Get a list from the database of all critters of a given species
-    #     Restrict the search to names starting with the 'starts_with' variable if provided
-    #     """
-    #     # check if the search should be restricted
-    #     if starts_with != "":
-    #         starts_with = await self.format_input(starts_with) # format the input
-    #         starts_with = f"WHERE name LIKE '{starts_with}%'" # add sql for search
-    #     c.execute(utils.search_all_critters(species_type, starts_with)) # Execute the SQL check
-    #     critter_list = list(c.fetchall())
-    #     critter_names = ""
-    #     for critter in critter_list:
-    #         critter_names = critter_names + f"{critter[0]}\n"
-    #     return critter_names
+    async def all_critter_by_species(self, species_type: str, starts_with: str):
+        """
+        Get a list from the database of all critters of a given species
+        Restrict the search to names starting with the 'starts_with' variable if provided
+        """
+        # check if the search should be restricted
+        if starts_with != "":
+            starts_with = await self.format_input(starts_with) # format the input
+            starts_with = f"AND critter_name LIKE '{starts_with}%'" # add sql for search
+        c.execute(utils.search_all_critters(species_type, starts_with)) # Execute the SQL check
+        critter_list = list(c.fetchall())
+        critter_names = ""
+        for critter in critter_list:
+            critter_names = critter_names + f"{critter[0]}\n"
+        return critter_names
 
-    # @commands.command()
-    # async def fish(self, ctx, starts_with: typing.Optional[str] = ""):
-    #     """
-    #     Display a list of all fish by name
-    #     If input is provided then find names beginning with the input
-    #     """
-    #     fish_names = await self.all_critter_by_species("fish", starts_with)
-    #     embed = discord.Embed(title = "Fish search", description = fish_names)
-    #     await ctx.send(embed = embed)
+    @commands.command()
+    async def fish(self, ctx, starts_with: typing.Optional[str] = ""):
+        """
+        Display a list of all fish by name
+        If input is provided then find names beginning with the input
+        """
+        fish_names = await self.all_critter_by_species("Fish", starts_with) # get a list of all fish names
+        embed = discord.Embed(title = "Fish search", description = fish_names)
+        await ctx.send(embed = embed)
 
-    # @commands.command()
-    # async def bug(self, ctx, starts_with: typing.Optional[str] = ""):
-    #     """
-    #     Display a list of all bugs by name
-    #     If input is provided then find names beginning with the input
-    #     """
-    #     bug_names = await self.all_critter_by_species("bugs", starts_with)
-    #     embed = discord.Embed(title = "Bug search", description = bug_names)
-    #     await ctx.send(embed = embed)
+    @commands.command()
+    async def bug(self, ctx, starts_with: typing.Optional[str] = ""):
+        """
+        Display a list of all bugs by name
+        If input is provided then find names beginning with the input
+        """
+        bug_names = await self.all_critter_by_species("Bug", starts_with) # get a list of all bug names
+        embed = discord.Embed(title = "Bug search", description = bug_names)
+        await ctx.send(embed = embed)
 
     @commands.command()
     async def s(self, ctx, *, critter_name: str):
@@ -321,7 +321,6 @@ class Search(commands.Cog):
             pass
         if critter: # if there is a match from the DB
             # create embed
-            critter.get_critter_time_period()
             embed = discord.Embed(title = f'{critter.name} Info', description = f"Everything you need to know about the {critter.name}")
             embed.add_field(name = "Name:", value = critter.name, inline = False)
             embed.add_field(name = "Type:", value = critter.species, inline = False)
