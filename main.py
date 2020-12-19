@@ -29,14 +29,14 @@ async def help(ctx, command_name: typing.Optional[str] = ""):
     elif command_name == "s":
         embed = discord.Embed(title = ">s critter_name", description = "Search for a critter by name and display all related information")
         embed.add_field(name = "Example", value = "`>s bitterling` will return all of the details about the bitterling such as size, value, etc")
-    # elif command_name == "fish":
-    #     embed = discord.Embed(title = ">fish starts_with", description = "Display a list of all fish in alphabetical order. If the optional `starts_with` is provided then the list will show fish starting with the input")
-    #     embed.add_field(name = "Example 1", value = "`>fish` will return all fish in the game in alphabetical order")
-    #     embed.add_field(name = "Example 2", value = "`>fish se` will return:\n- Sea Bass\n- Sea Butterfly\n- Sea Horse", inline = False)
-    # elif command_name == "bug":
-    #     embed = discord.Embed(title = ">bug starts_with", description = "Display a list of all bugs in alphabetical order. If the optional `starts_with` is provided then the list will show bugs starting with the input")
-    #     embed.add_field(name = "Example 1", value = "`>bug` will return all bugs in the game in alphabetical order")
-    #     embed.add_field(name = "Example 2", value = "`>bug sc` will return:\n- Scarab Beetle\n- Scorpion", inline = False)
+    elif command_name == "fish":
+        embed = discord.Embed(title = ">fish starts_with", description = "Display a list of all fish in alphabetical order. If the optional `starts_with` is provided then the list will show fish starting with the input")
+        embed.add_field(name = "Example 1", value = "`>fish` will return all fish in the game in alphabetical order")
+        embed.add_field(name = "Example 2", value = "`>fish se` will return:\n- Sea Bass\n- Sea Butterfly\n- Sea Horse", inline = False)
+    elif command_name == "bug":
+        embed = discord.Embed(title = ">bug starts_with", description = "Display a list of all bugs in alphabetical order. If the optional `starts_with` is provided then the list will show bugs starting with the input")
+        embed.add_field(name = "Example 1", value = "`>bug` will return all bugs in the game in alphabetical order")
+        embed.add_field(name = "Example 2", value = "`>bug sc` will return:\n- Scarab Beetle\n- Scorpion", inline = False)
     # elif command_name == "month":
     #     embed = discord.Embed(title = ">month", description = "Get a list of all fish and bugs available this month")
     #     embed.add_field(name = "Notes:", value = "Currently this command only works for the northern hemisphere")
