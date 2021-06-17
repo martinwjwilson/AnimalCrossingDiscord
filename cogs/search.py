@@ -60,13 +60,14 @@ class Search(commands.Cog):
     #     # check if current month is in list
     #     return list_of_months_available
 
-    # async def availability_review(self, critter_month: str):
-    #     """
-    #     Check the availability for an individual critter
-    #     """
-    #     # check if the critter is all year round
-    #     if critter_month.startswith("Year"):
-    #         return True
+    @staticmethod
+    async def availability_review(self, critter_month: str):
+        """
+        Check the availability for an individual critter
+        """
+        # check if the critter is all year round
+        if critter_month.startswith("Year"):
+            return True
     #     # get this months month
     #     current_month = date.today().strftime("%B")
     #     northern_months = critter_month.split("/")[0] # split the critter month into Northern and Southern
@@ -97,40 +98,41 @@ class Search(commands.Cog):
     #     else: # it is available for a single month per year
     #         if current_month == northern_months:
     #             return True
-    #     return False
+        return False
 
-    # async def this_month_critter_filter(self, list_of_critters: list):
-    #     """
-    #     filters list of all bugs and fish to ones available this month
-    #     """
-    #     critters_available_list = [] # list of critters available this month
-    #     # check each critter against the current date
-    #     for critter in list_of_critters:
-    #         # check if the critter is a fish or a bug
-    #         if critter[1] == "Fish":
-    #             # check availability this month
-    #             if await self.availability_review(critter[6]):
-    #                 critters_available_list.append(critter[0])
-    #         else:
-    #             # check availability this month
-    #             if await self.availability_review(critter[5]):
-    #                 critters_available_list.append(critter[0])
-    #     return critters_available_list
+    @staticmethod
+    async def this_month_critter_filter(self, list_of_critters: list):
+        """
+        filters list of all bugs and fish to ones available this month
+        """
+        critters_available_list = []  # list of critters available this month
+        # check each critter against the current date
+        for critter in list_of_critters:
+            # check if the critter is a fish or a bug
+            if critter[1] == "Fish":
+                # check availability this month
+                if await self.availability_review(critter[6]):
+                    critters_available_list.append(critter[0])
+            else:
+                # check availability this month
+                if await self.availability_review(critter[5]):
+                    critters_available_list.append(critter[0])
+        return critters_available_list
 
-    # @commands.command()
-    # async def month(self, ctx):
-    #     """
-    #     Get a list of all fish and bugs available this month
-    #     """
-    #     # get all fish
-    #     c.execute(utils.search_all_critters("fish", "")) # Execute the SQL check
-    #     fish_list = list(c.fetchall())
-    #     # get all bugs
-    #     c.execute(utils.search_all_critters("bugs", "")) # Execute the SQL check
-    #     bug_list = list(c.fetchall())
-    #     description_f = ""
-    #     description_b = ""
-    #     # get a list of all fish available this month
+    @commands.command()
+    async def month(self, ctx):
+        """
+        Get a list of all fish and bugs available this month
+        """
+        # get all fish
+        c.execute(utils.search_all_critters("Fish", ""))  # Execute the SQL check
+        fish_list = list(c.fetchall())
+        # get all bugs
+        c.execute(utils.search_all_critters("Bugs", ""))  # Execute the SQL check
+        bug_list = list(c.fetchall())
+        description_f = ""
+        description_b = ""
+        # get a list of all fish available this month
     #     critters_available_list = await self.this_month_critter_filter(fish_list)
     #     for critter in critters_available_list:
     #         description_f = description_f + f"\n{critter}"
