@@ -5,6 +5,7 @@ env/
 
 # Don't track these files
 token.json
+.idea/
 
 # Compiled source #
 ###################
