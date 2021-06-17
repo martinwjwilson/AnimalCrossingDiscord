@@ -14,11 +14,6 @@ class Search(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(hidden=True)
-    @commands.check(utils.check_if_it_is_dev)
-    async def test(self, ctx):
-        await ctx.send("this is a test")
-
     async def format_input(self, input):
         """
         Format a string to match the style of the db entries
