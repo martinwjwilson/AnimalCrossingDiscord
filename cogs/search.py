@@ -3,8 +3,7 @@ from discord.ext import commands
 import utils
 import sqlite3
 import typing
-from datetime import date
-from critter import Critter
+from models.critter import Critter
 
 # db
 conn = sqlite3.connect("ailurus.db")
