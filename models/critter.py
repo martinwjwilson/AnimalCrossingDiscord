@@ -1,4 +1,4 @@
-class Critter():
+class Critter:
     def __init__(self, name, species, location, size, value, start_time, end_time, alt_start_time, alt_end_time, start_month, end_month, alt_start_month, alt_end_month, image_url):
         self.name = name
         self.species = species
