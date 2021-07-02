@@ -21,7 +21,7 @@ class Search(commands.Cog):
         """
         str_input = "".join(input_string)  # join arguments together
         # fix casing
-        word_list = str_input.lower().split(" ")  # split each word by space and make lowercase
+        word_list = str_input.lower().split(" ")  # make the string lowercase then split each word by space
         output = []
         for word in word_list:
             output.append(word.capitalize())  # capitalise all lowercase words in list
