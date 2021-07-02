@@ -14,7 +14,8 @@ class Search(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def format_input(self, input):
+    @staticmethod
+    async def format_input(input_string: str):
         """
         Format a string to match the style of the db entries
         """
