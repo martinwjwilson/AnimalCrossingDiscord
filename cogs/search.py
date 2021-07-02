@@ -257,13 +257,13 @@ class Search(commands.Cog):
     #     Display a list of all fish and bugs arriving in the current month
     #     """
     #     await self.arriving_or_leaving(ctx, "arriving", hemisphere)
-
-    # @commands.command()
-    # async def leaving(self, ctx, hemisphere: typing.Optional[str] = "n"):
-    #     """
-    #     Display a list of all fish and bugs leaving at the end of the current month
-    #     """
-    #     await self.arriving_or_leaving(ctx, "leaving", hemisphere)
+    
+    @commands.command()
+    async def leaving(self, ctx, hemisphere: typing.Optional[str] = "n"):
+        """
+        Display a list of all fish and bugs leaving at the end of the current month
+        """
+        await self.arriving_or_leaving(ctx, "leaving", hemisphere)
 
     async def all_critter_by_species(self, species_type: str, starts_with: str):
         """
