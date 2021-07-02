@@ -351,29 +351,29 @@ class Search(commands.Cog):
         """
         critter_name = await self.format_input(critter_name)  # alter the user input to match the db format
         # Check the critter table to see if any of the critter names match the user input
-        critter_list = False
         c.execute(utils.check_for_critter(critter_name))
         try:
             critter = await self.create_critter(list(c.fetchone()))
+            if critter:  # if there is a match from the DB
+                # create embed
+                embed = discord.Embed(title=f'{critter.name} Info',
+                                      description=f"Everything you need to know about the {critter.name}")
+                embed.add_field(name="Name:", value=critter.name, inline=False)
+                embed.add_field(name="Type:", value=critter.species, inline=False)
+                embed.add_field(name="Location:", value=critter.location, inline=False)
+                if critter.species == 'Fish':  # if critter was a fish
+                    embed.add_field(name="Size:", value=critter.size, inline=False)
+                embed.add_field(name="Value:", value=critter.value, inline=False)
+                embed.add_field(name="Time:", value=f"{critter.start_time} - {critter.end_time}", inline=False)
+                embed.add_field(name="Month:", value=f"{critter.start_month} - {critter.end_month}", inline=False)
+                embed.set_image(url=critter.image_url)
+                await ctx.send(embed=embed)
+            else:
+                await ctx.send(
+                    f"Sorry, {critter_name} is not a valid critter name\nPlease try using the `bug` or `fish` "
+                    f"commands to check your spelling against the listed species")
         except Exception as e:
             pass
-        if critter:  # if there is a match from the DB
-            # create embed
-            embed = discord.Embed(title=f'{critter.name} Info',
-                                  description=f"Everything you need to know about the {critter.name}")
-            embed.add_field(name="Name:", value=critter.name, inline=False)
-            embed.add_field(name="Type:", value=critter.species, inline=False)
-            embed.add_field(name="Location:", value=critter.location, inline=False)
-            if critter.species == 'Fish':  # if critter was a fish
-                embed.add_field(name="Size:", value=critter.size, inline=False)
-            embed.add_field(name="Value:", value=critter.value, inline=False)
-            embed.add_field(name="Time:", value=f"{critter.start_time} - {critter.end_time}", inline=False)
-            embed.add_field(name="Month:", value=f"{critter.start_month} - {critter.end_month}", inline=False)
-            embed.set_image(url=critter.image_url)
-            await ctx.send(embed=embed)
-        else:
-            await ctx.send(
-                f"Sorry, {critter_name} is not a valid critter name\nPlease try using the `bug` or `fish` commands to check your spelling against the listed species")
 
 
 def setup(bot):
