@@ -236,20 +236,25 @@ class Search(commands.Cog):
     #     # return the finalised string
     #     return critter_string
 
-    # async def arriving_or_leaving(self, ctx, change_type: str, hemisphere: str):
-    #     """
-    #     Display a list of all fish and bugs arriving in the current month
-    #     """
-    #     # check that hemisphere is valid
-    #     if hemisphere != "n" and hemisphere != "s":
-    #         await ctx.send("Invalid hemisphere. Must be either `n` or `s`. (No input will default to `n`)")
-    #         return
-    #     # create embeds
-    #     embed_f = disnake.Embed(title = "List of Fish leaving this month", description = await self.list_of_critter_changing("fish", change_type, hemisphere))
-    #     embed_b = disnake.Embed(title = "List of Bugs leaving this month", description = await self.list_of_critter_changing("bugs", change_type, hemisphere))
-    #     # send embeds
-    #     await ctx.send(embed = embed_f)
-    #     await ctx.send(embed = embed_b)
+    @staticmethod
+    async def arriving_or_leaving(self, ctx, change_type: str, hemisphere: str):
+        """
+        Display a list of all fish and bugs arriving in the current month
+        """
+        # check that hemisphere is valid
+        if hemisphere == "n" or hemisphere == "s":
+            # create embeds
+            embed_f = discord.Embed(title="List of Fish leaving this month",
+                                    description=await self.list_of_critter_changing("fish", change_type, hemisphere))
+            embed_b = discord.Embed(title="List of Bugs leaving this month",
+                                    description=await self.list_of_critter_changing("bugs", change_type, hemisphere))
+            # send embeds
+            await ctx.send(embed=embed_f)
+            await ctx.send(embed=embed_b)
+        else:
+            await ctx.send("Invalid hemisphere. Must be either `n` or `s`. (No input will default to `n`)")
+            return
+
 
     # @commands.command()
     # async def arriving(self, ctx, hemisphere: typing.Optional[str] = "n"):
