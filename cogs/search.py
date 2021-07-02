@@ -354,10 +354,7 @@ class Search(commands.Cog):
         critter_list = False
         c.execute(utils.check_for_critter(critter_name))
         try:
-            critter = list(c.fetchone())
-            # create a new critter instance
-            critter = Critter(critter[0], critter[1], critter[2], critter[3], critter[4], critter[5], critter[6],
-                              critter[7], critter[8], critter[9], critter[10], critter[11], critter[12], critter[13])
+            critter = await self.create_critter(list(c.fetchone()))
         except Exception as e:
             pass
         if critter:  # if there is a match from the DB
