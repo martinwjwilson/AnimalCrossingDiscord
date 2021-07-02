@@ -275,10 +275,10 @@ class Search(commands.Cog):
             starts_with = await self.format_input(starts_with)  # format the input
             starts_with = f"AND critter_name LIKE '{starts_with}%'"  # add sql for search
         c.execute(utils.search_all_critters(species_type, starts_with))  # Execute the SQL check
-        critter_list = list(c.fetchall())
+        critter_list = await self.create_critter_list(list(c.fetchall()))
         critter_names = ""
         for critter in critter_list:
-            critter_names = critter_names + f"{critter[0]}\n"
+            critter_names = critter_names + f"{critter.name}\n"
         return critter_names
 
     @staticmethod
