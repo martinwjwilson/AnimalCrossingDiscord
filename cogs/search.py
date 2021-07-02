@@ -281,6 +281,49 @@ class Search(commands.Cog):
             critter_names = critter_names + f"{critter[0]}\n"
         return critter_names
 
+    @staticmethod
+    async def create_critter(critter: list) -> Critter:
+        return Critter(
+            name=critter[0],
+            species=critter[1],
+            location=critter[2],
+            size=critter[3],
+            value=critter[4],
+            start_time=critter[5],
+            end_time=critter[6],
+            alt_start_time=critter[7],
+            alt_end_time=critter[8],
+            start_month=critter[9],
+            end_month=critter[10],
+            alt_start_month=critter[11],
+            alt_end_month=critter[12],
+            image_url=critter[13]
+        )
+
+    @staticmethod
+    async def create_critter_list(critter_list: list) -> [Critter]:
+        critter_class_list = []
+        for critter in critter_list:
+            print("This is a critter")
+            print(critter)
+            critter_class_list.append(Critter(
+                name=critter[0],
+                species=critter[1],
+                location=critter[2],
+                size=critter[3],
+                value=critter[4],
+                start_time=critter[5],
+                end_time=critter[6],
+                alt_start_time=critter[7],
+                alt_end_time=critter[8],
+                start_month=critter[9],
+                end_month=critter[10],
+                alt_start_month=critter[11],
+                alt_end_month=critter[12],
+                image_url=critter[13]
+            ))
+        return critter_class_list
+
     @commands.command()
     async def fish(self, ctx, starts_with: typing.Optional[str] = ""):
         """
