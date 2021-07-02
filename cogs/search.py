@@ -3,8 +3,7 @@ from discord.ext import commands
 import utils
 import sqlite3
 import typing
-from datetime import date
-from critter import Critter
+from models.critter import Critter
 
 # db
 conn = sqlite3.connect("ailurus.db")
@@ -15,13 +14,14 @@ class Search(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def format_input(self, input):
+    @staticmethod
+    async def format_input(input_string: str):
         """
         Format a string to match the style of the db entries
         """
-        str_input = "".join(input)  # join arguments together
+        str_input = "".join(input_string)  # join arguments together
         # fix casing
-        word_list = str_input.lower().split(" ")  # split each word by space and make lowercase
+        word_list = str_input.lower().split(" ")  # make the string lowercase then split each word by space
         output = []
         for word in word_list:
             output.append(word.capitalize())  # capitalise all lowercase words in list
@@ -281,6 +281,49 @@ class Search(commands.Cog):
             critter_names = critter_names + f"{critter[0]}\n"
         return critter_names
 
+    @staticmethod
+    async def create_critter(critter: list) -> Critter:
+        return Critter(
+            name=critter[0],
+            species=critter[1],
+            location=critter[2],
+            size=critter[3],
+            value=critter[4],
+            start_time=critter[5],
+            end_time=critter[6],
+            alt_start_time=critter[7],
+            alt_end_time=critter[8],
+            start_month=critter[9],
+            end_month=critter[10],
+            alt_start_month=critter[11],
+            alt_end_month=critter[12],
+            image_url=critter[13]
+        )
+
+    @staticmethod
+    async def create_critter_list(critter_list: list) -> [Critter]:
+        critter_class_list = []
+        for critter in critter_list:
+            print("This is a critter")
+            print(critter)
+            critter_class_list.append(Critter(
+                name=critter[0],
+                species=critter[1],
+                location=critter[2],
+                size=critter[3],
+                value=critter[4],
+                start_time=critter[5],
+                end_time=critter[6],
+                alt_start_time=critter[7],
+                alt_end_time=critter[8],
+                start_month=critter[9],
+                end_month=critter[10],
+                alt_start_month=critter[11],
+                alt_end_month=critter[12],
+                image_url=critter[13]
+            ))
+        return critter_class_list
+
     @commands.command()
     async def fish(self, ctx, starts_with: typing.Optional[str] = ""):
         """
@@ -311,10 +354,7 @@ class Search(commands.Cog):
         critter_list = False
         c.execute(utils.check_for_critter(critter_name))
         try:
-            critter = list(c.fetchone())
-            # create a new critter instance
-            critter = Critter(critter[0], critter[1], critter[2], critter[3], critter[4], critter[5], critter[6],
-                              critter[7], critter[8], critter[9], critter[10], critter[11], critter[12], critter[13])
+            critter = await self.create_critter(list(c.fetchone()))
         except Exception as e:
             pass
         if critter:  # if there is a match from the DB
