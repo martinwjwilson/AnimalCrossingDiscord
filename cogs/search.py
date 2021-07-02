@@ -19,7 +19,7 @@ class Search(commands.Cog):
         """
         Format a string to match the style of the db entries
         """
-        str_input = "".join(input)  # join arguments together
+        str_input = "".join(input_string)  # join arguments together
         # fix casing
         word_list = str_input.lower().split(" ")  # split each word by space and make lowercase
         output = []
