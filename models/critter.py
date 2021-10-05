@@ -17,3 +17,15 @@ class Critter:
 
     def get_critter_time_period(self):
         print(self.start_month)
+
+    def is_arriving(self, month_to_check) -> bool:
+        if self.start_month == month_to_check or self.alt_start_month == month_to_check:
+            return True
+        else:
+            return False
+
+    def is_leaving(self, month_to_check) -> bool:
+        if self.end_month == month_to_check or self.alt_end_month == month_to_check:
+            return True
+        else:
+            return False
