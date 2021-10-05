@@ -281,6 +281,10 @@ class Search(commands.Cog):
             starts_with = f"AND critter_name LIKE '{starts_with}%'"  # add sql for search
         c.execute(utils.search_all_critters(species_type, starts_with))  # Execute the SQL check
         critter_list = await self.create_critter_list(list(c.fetchall()))
+        return critter_list
+
+    @staticmethod
+    async def critter_list_to_string_of_names(critter_list: [Critter]) -> str:
         critter_names = ""
         for critter in critter_list:
             critter_names = critter_names + f"{critter.name}\n"
@@ -335,8 +339,9 @@ class Search(commands.Cog):
         Display a list of all fish by name
         If input is provided then find names beginning with the input
         """
-        fish_names = await self.all_critter_by_species("Fish", starts_with)  # get a list of all fish names
-        embed = disnake.Embed(title="Fish search", description=fish_names)
+        fish_list = await self.all_critter_by_species("Fish", starts_with)  # get a list of all fish
+        fish_names = await self.critter_list_to_string_of_names(fish_list)  # convert fish to list of their names
+        embed = discord.Embed(title="Fish search", description=fish_names)
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -345,8 +350,9 @@ class Search(commands.Cog):
         Display a list of all bugs by name
         If input is provided then find names beginning with the input
         """
-        bug_names = await self.all_critter_by_species("Bug", starts_with)  # get a list of all bug names
-        embed = disnake.Embed(title="Bug search", description=bug_names)
+        bug_list = await self.all_critter_by_species("Bug", starts_with)  # get a list of all bug names
+        bug_names = await self.critter_list_to_string_of_names(bug_list)
+        embed = discord.Embed(title="Bug search", description=bug_names)
         await ctx.send(embed=embed)
 
     @commands.command()
