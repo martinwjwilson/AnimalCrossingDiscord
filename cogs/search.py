@@ -6,6 +6,7 @@ import utils
 import sqlite3
 import typing
 from models.critter import Critter
+from models.hemisphere import Hemisphere
 
 # db
 conn = sqlite3.connect("ailurus.db")
@@ -31,7 +32,7 @@ class Search(commands.Cog):
         "December": 12}
 
     @staticmethod
-    async def format_input(input_string: str):
+    async def format_input(input_string: str) -> str:
         """
         Format a string to match the style of the db entries
         """
@@ -76,11 +77,6 @@ class Search(commands.Cog):
     #                 list_of_months_available.append(month)
     #     # check if current month is in list
     #     return list_of_months_available
-
-    async def calculate_opposite_hemisphere_month(self, current_month: str) -> str:
-        current_month_number = self.dictionary_of_all_months[current_month]
-        if current_month_number < 7:
-            opposite_month =
 
     @staticmethod
     async def availability_review(self, critter_month: str):
@@ -193,27 +189,21 @@ class Search(commands.Cog):
     #         else:
     #             return False
 
-    async def critter_fits_change_check(self, critter: Critter, change_type: str, hemisphere: str) -> bool:
+    async def critter_fits_change_check(self, critter: Critter, change_type: str, hemisphere: Hemisphere) -> bool:
         """
         Check if a critter follows the change being checked against
         Return a bool representing if the critter does or doesn't follow the change
         e.g. a critter leaves in June and the check is for all critters leaving in June. Return True
         """
-        # get the current month in the desired format
-        current_month = date.today().strftime("%B")
         # check if the current month matches the critter availability
-        if hemisphere == "n":  # Northern
-            if change_type == "arriving":
-                if critter.is_arriving(current_month):
-                    return True
-            if change_type == "leaving":
-                if critter.is_leaving(current_month):
-                    return True
+        if change_type == "arriving" and critter.is_arriving(hemisphere):
+            return True
+        elif change_type == "leaving" and critter.is_leaving(hemisphere):
+            return True
+        else:
             return False
-        else:  # Southern
-            current_month = calculate_opposite_hemisphere_month(current_month)
 
-    async def critter_filter_by_changing(self, list_of_critters: [Critter], change_type: str, hemisphere: str) -> [
+    async def critter_filter_by_changing(self, list_of_critters: [Critter], change_type: str, hemisphere: Hemisphere) -> [
         Critter]:
         """
         Filters list of all bugs and fish to ones arriving or leaving this month
@@ -226,66 +216,52 @@ class Search(commands.Cog):
         return critters_available_list
 
     @staticmethod
-    async def list_of_critter_changing(self, species: str, change_type: str, hemisphere: str) -> [Critter]:
+    async def list_of_critter_changing(self, species: str, change_type: str, hemisphere: Hemisphere) -> [Critter]:
         """
         Formats and returns a list of all critters of a given species leaving or arriving depending on the command called
         """
-        # get the full list of species
+        # get the full list of critters of the specified species
         c.execute(utils.search_all_critters(species, ""))
         all_critter_list = await self.create_critter_list(list(c.fetchall()))
-        # check if arriving or leaving command was called
-        if change_type == "arriving":
-            critters_available_list = await self.critter_filter_by_changing(all_critter_list, change_type, hemisphere)
-        else:
-            critters_available_list = await self.critter_filter_by_changing(all_critter_list, change_type, hemisphere)
+        # filter the list to only show changing critters
+        critters_available_list = await self.critter_filter_by_changing(all_critter_list, change_type, hemisphere)
         print(critters_available_list)
         return critters_available_list
 
-    #     # convert the list into a string
-    #     critter_string = ""
-    #     for critter in critters_available_list:
-    #         critter_string = critter_string + f"\n{critter}"
-    #     # return the finalised string
-    #     return critter_string
-
     @staticmethod
-    async def availability_changing(self, ctx, change_type: str, hemisphere: str):
+    async def display_list_of_changing_critters(self, ctx, critter_type, change_type: str, hemisphere: Hemisphere):
+        """
+        Displays lists of all critters of the specified type that are arriving or leaving
+        """
+        # get a list of all critters
+        all_critters_list = await self.list_of_critter_changing(self, critter_type, change_type, hemisphere)
+        # get a list of all critter names as strings
+        all_critters_string = await self.critter_list_to_string_of_names(all_critters_list)
+        # create embeds
+        embed = discord.Embed(title=f"List of {critter_type} leaving this month",
+                              description=all_critters_string)
+        # send embed
+        await ctx.send(embed=embed)
+
+    @commands.command()
+    async def arriving(self, ctx, user_hemisphere: typing.Optional[str] = "n"):
         """
         Display a list of all fish and bugs arriving in the current month
         """
-        # check that hemisphere is valid
-        if hemisphere == "n" or hemisphere == "s":
-            # get lists of critters
-            all_fish_list = await self.list_of_critter_changing(self, "Fish", change_type, hemisphere)
-            all_bug_list = await self.list_of_critter_changing(self, "Bug", change_type, hemisphere)
-            # get strings of all critter names
-            all_fish_string = await self.critter_list_to_string_of_names(all_fish_list)
-            all_bug_string = await self.critter_list_to_string_of_names(all_bug_list)
-            # create embeds
-            embed_f = discord.Embed(title="List of Fish leaving this month",
-                                    description=await self.list_of_critter_changing("fish", change_type, hemisphere))
-            embed_b = discord.Embed(title="List of Bugs leaving this month",
-                                    description=await self.list_of_critter_changing("bugs", change_type, hemisphere))
-            # send embeds
-            await ctx.send(embed=embed_f)
-            await ctx.send(embed=embed_b)
-        else:
-            await ctx.send("Invalid hemisphere. Must be either `n` or `s`. (No input will default to `n`)")
-            return
+        # Convert the user input to work out which hemisphere is being checked
+        hemisphere = Hemisphere.convert_text_to_hemisphere(user_hemisphere)
+        # Display lists of the critters arriving
+        # fish
+        await self.display_list_of_changing_critters(self, ctx, "fish", "arriving", hemisphere)
+        # bugs
+        await self.display_list_of_changing_critters(self, ctx, "bugs", "arriving", hemisphere)
 
     # @commands.command()
-    # async def arriving(self, ctx, hemisphere: typing.Optional[str] = "n"):
+    # async def leaving(self, ctx, hemisphere: typing.Optional[str] = "n"):
     #     """
-    #     Display a list of all fish and bugs arriving in the current month
+    #     Post a list of all fish and bugs leaving at the end of the current month
     #     """
-    #     await self.availability_changing(ctx, "arriving", hemisphere)
-
-    @commands.command()
-    async def leaving(self, ctx, hemisphere: typing.Optional[str] = "n"):
-        """
-        Display a list of all fish and bugs leaving at the end of the current month
-        """
-        await self.availability_changing(self, ctx, "leaving", hemisphere)
+    #     await self.availability_changing(self, ctx, "leaving", hemisphere)
 
     async def all_critter_by_species(self, species_type: str, starts_with: str) -> [Critter]:
         """
