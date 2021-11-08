@@ -3,33 +3,29 @@ from discord.ext import commands
 import utils
 import sqlite3
 import typing
-from datetime import date
-from critter import Critter
+from models.critter import Critter
 
 # db
 conn = sqlite3.connect("ailurus.db")
 c = conn.cursor()
 
+
 class Search(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(hidden=True)
-    @commands.check(utils.check_if_it_is_dev)
-    async def test(self, ctx):
-        await ctx.send("this is a test")
-
-    async def format_input(self, input):
+    @staticmethod
+    async def format_input(input_string: str):
         """
         Format a string to match the style of the db entries
         """
-        str_input = "".join(input) # join arguments together
+        str_input = "".join(input_string)  # join arguments together
         # fix casing
-        word_list = str_input.lower().split(" ") # split each word by space and make lowercase
+        word_list = str_input.lower().split(" ")  # make the string lowercase then split each word by space
         output = []
         for word in word_list:
-            output.append(word.capitalize()) # capitalise all lowercase words in list
-        return " ".join(output) # join words back together with a space between them
+            output.append(word.capitalize())  # capitalise all lowercase words in list
+        return " ".join(output)  # join words back together with a space between them
 
     # async def month_list(self, start_month: str, end_month: str):
     #     """
@@ -64,14 +60,14 @@ class Search(commands.Cog):
     #     # check if current month is in list
     #     return list_of_months_available
 
-
-    # async def availability_review(self, critter_month: str):
-    #     """
-    #     Check the availability for an individual critter
-    #     """
-    #     # check if the critter is all year round
-    #     if critter_month.startswith("Year"):
-    #         return True
+    @staticmethod
+    async def availability_review(self, critter_month: str):
+        """
+        Check the availability for an individual critter
+        """
+        # check if the critter is all year round
+        if critter_month.startswith("Year"):
+            return True
     #     # get this months month
     #     current_month = date.today().strftime("%B")
     #     northern_months = critter_month.split("/")[0] # split the critter month into Northern and Southern
@@ -102,40 +98,41 @@ class Search(commands.Cog):
     #     else: # it is available for a single month per year
     #         if current_month == northern_months:
     #             return True
-    #     return False
+        return False
 
-    # async def this_month_critter_filter(self, list_of_critters: list):
-    #     """
-    #     filters list of all bugs and fish to ones available this month
-    #     """
-    #     critters_available_list = [] # list of critters available this month
-    #     # check each critter against the current date
-    #     for critter in list_of_critters:
-    #         # check if the critter is a fish or a bug
-    #         if critter[1] == "Fish":
-    #             # check availability this month
-    #             if await self.availability_review(critter[6]):
-    #                 critters_available_list.append(critter[0])
-    #         else:
-    #             # check availability this month
-    #             if await self.availability_review(critter[5]):
-    #                 critters_available_list.append(critter[0])
-    #     return critters_available_list
+    @staticmethod
+    async def this_month_critter_filter(self, list_of_critters: list):
+        """
+        filters list of all bugs and fish to ones available this month
+        """
+        critters_available_list = []  # list of critters available this month
+        # check each critter against the current date
+        for critter in list_of_critters:
+            # check if the critter is a fish or a bug
+            if critter[1] == "Fish":
+                # check availability this month
+                if await self.availability_review(critter[6]):
+                    critters_available_list.append(critter[0])
+            else:
+                # check availability this month
+                if await self.availability_review(critter[5]):
+                    critters_available_list.append(critter[0])
+        return critters_available_list
 
-    # @commands.command()
-    # async def month(self, ctx):
-    #     """
-    #     Get a list of all fish and bugs available this month
-    #     """
-    #     # get all fish
-    #     c.execute(utils.search_all_critters("fish", "")) # Execute the SQL check
-    #     fish_list = list(c.fetchall())
-    #     # get all bugs
-    #     c.execute(utils.search_all_critters("bugs", "")) # Execute the SQL check
-    #     bug_list = list(c.fetchall())
-    #     description_f = ""
-    #     description_b = ""
-    #     # get a list of all fish available this month
+    @commands.command()
+    async def month(self, ctx):
+        """
+        Get a list of all fish and bugs available this month
+        """
+        # get all fish
+        c.execute(utils.search_all_critters("Fish", ""))  # Execute the SQL check
+        fish_list = list(c.fetchall())
+        # get all bugs
+        c.execute(utils.search_all_critters("Bugs", ""))  # Execute the SQL check
+        bug_list = list(c.fetchall())
+        description_f = ""
+        description_b = ""
+        # get a list of all fish available this month
     #     critters_available_list = await self.this_month_critter_filter(fish_list)
     #     for critter in critters_available_list:
     #         description_f = description_f + f"\n{critter}"
@@ -275,14 +272,57 @@ class Search(commands.Cog):
         """
         # check if the search should be restricted
         if starts_with != "":
-            starts_with = await self.format_input(starts_with) # format the input
-            starts_with = f"AND critter_name LIKE '{starts_with}%'" # add sql for search
-        c.execute(utils.search_all_critters(species_type, starts_with)) # Execute the SQL check
-        critter_list = list(c.fetchall())
+            starts_with = await self.format_input(starts_with)  # format the input
+            starts_with = f"AND critter_name LIKE '{starts_with}%'"  # add sql for search
+        c.execute(utils.search_all_critters(species_type, starts_with))  # Execute the SQL check
+        critter_list = await self.create_critter_list(list(c.fetchall()))
         critter_names = ""
         for critter in critter_list:
-            critter_names = critter_names + f"{critter[0]}\n"
+            critter_names = critter_names + f"{critter.name}\n"
         return critter_names
+
+    @staticmethod
+    async def create_critter(critter: list) -> Critter:
+        return Critter(
+            name=critter[0],
+            species=critter[1],
+            location=critter[2],
+            size=critter[3],
+            value=critter[4],
+            start_time=critter[5],
+            end_time=critter[6],
+            alt_start_time=critter[7],
+            alt_end_time=critter[8],
+            start_month=critter[9],
+            end_month=critter[10],
+            alt_start_month=critter[11],
+            alt_end_month=critter[12],
+            image_url=critter[13]
+        )
+
+    @staticmethod
+    async def create_critter_list(critter_list: list) -> [Critter]:
+        critter_class_list = []
+        for critter in critter_list:
+            print("This is a critter")
+            print(critter)
+            critter_class_list.append(Critter(
+                name=critter[0],
+                species=critter[1],
+                location=critter[2],
+                size=critter[3],
+                value=critter[4],
+                start_time=critter[5],
+                end_time=critter[6],
+                alt_start_time=critter[7],
+                alt_end_time=critter[8],
+                start_month=critter[9],
+                end_month=critter[10],
+                alt_start_month=critter[11],
+                alt_end_month=critter[12],
+                image_url=critter[13]
+            ))
+        return critter_class_list
 
     @commands.command()
     async def fish(self, ctx, starts_with: typing.Optional[str] = ""):
@@ -290,9 +330,9 @@ class Search(commands.Cog):
         Display a list of all fish by name
         If input is provided then find names beginning with the input
         """
-        fish_names = await self.all_critter_by_species("Fish", starts_with) # get a list of all fish names
-        embed = discord.Embed(title = "Fish search", description = fish_names)
-        await ctx.send(embed = embed)
+        fish_names = await self.all_critter_by_species("Fish", starts_with)  # get a list of all fish names
+        embed = discord.Embed(title="Fish search", description=fish_names)
+        await ctx.send(embed=embed)
 
     @commands.command()
     async def bug(self, ctx, starts_with: typing.Optional[str] = ""):
@@ -300,40 +340,41 @@ class Search(commands.Cog):
         Display a list of all bugs by name
         If input is provided then find names beginning with the input
         """
-        bug_names = await self.all_critter_by_species("Bug", starts_with) # get a list of all bug names
-        embed = discord.Embed(title = "Bug search", description = bug_names)
-        await ctx.send(embed = embed)
+        bug_names = await self.all_critter_by_species("Bug", starts_with)  # get a list of all bug names
+        embed = discord.Embed(title="Bug search", description=bug_names)
+        await ctx.send(embed=embed)
 
     @commands.command()
     async def s(self, ctx, *, critter_name: str):
         """
         Search for a critter by name and display all of its information
         """
-        critter_name = await self.format_input(critter_name) # alter the user input to match the db format
+        critter_name = await self.format_input(critter_name)  # alter the user input to match the db format
         # Check the critter table to see if any of the critter names match the user input
-        critter_list = False
         c.execute(utils.check_for_critter(critter_name))
         try:
-            critter = list(c.fetchone())
-            # create a new critter instance
-            critter = Critter(critter[0], critter[1], critter[2], critter[3], critter[4], critter[5], critter[6], critter[7], critter[8], critter[9], critter[10], critter[11], critter[12], critter[13])
+            critter = await self.create_critter(list(c.fetchone()))
+            if critter:  # if there is a match from the DB
+                # create embed
+                embed = discord.Embed(title=f'{critter.name} Info',
+                                      description=f"Everything you need to know about the {critter.name}")
+                embed.add_field(name="Name:", value=critter.name, inline=False)
+                embed.add_field(name="Type:", value=critter.species, inline=False)
+                embed.add_field(name="Location:", value=critter.location, inline=False)
+                if critter.species == 'Fish':  # if critter was a fish
+                    embed.add_field(name="Size:", value=critter.size, inline=False)
+                embed.add_field(name="Value:", value=critter.value, inline=False)
+                embed.add_field(name="Time:", value=f"{critter.start_time} - {critter.end_time}", inline=False)
+                embed.add_field(name="Month:", value=f"{critter.start_month} - {critter.end_month}", inline=False)
+                embed.set_image(url=critter.image_url)
+                await ctx.send(embed=embed)
+            else:
+                await ctx.send(
+                    f"Sorry, {critter_name} is not a valid critter name\nPlease try using the `bug` or `fish` "
+                    f"commands to check your spelling against the listed species")
         except Exception as e:
             pass
-        if critter: # if there is a match from the DB
-            # create embed
-            embed = discord.Embed(title = f'{critter.name} Info', description = f"Everything you need to know about the {critter.name}")
-            embed.add_field(name = "Name:", value = critter.name, inline = False)
-            embed.add_field(name = "Type:", value = critter.species, inline = False)
-            embed.add_field(name = "Location:", value = critter.location, inline = False)
-            if critter.species == 'Fish': # if critter was a fish
-                embed.add_field(name = "Size:", value = critter.size, inline = False)
-            embed.add_field(name = "Value:", value = critter.value, inline = False)
-            embed.add_field(name = "Time:", value = f"{critter.start_time} - {critter.end_time}", inline = False)
-            embed.add_field(name = "Month:", value = f"{critter.start_month} - {critter.end_month}", inline = False)
-            embed.set_image(url = critter.image_url)
-            await ctx.send(embed = embed)
-        else:
-            await ctx.send(f"Sorry, {critter_name} is not a valid critter name\nPlease try using the `bug` or `fish` commands to check your spelling against the listed species")
+
 
 def setup(bot):
     bot.add_cog(Search(bot))

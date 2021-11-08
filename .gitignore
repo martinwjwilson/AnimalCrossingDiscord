@@ -1,11 +1,11 @@
 # Don't track content of these folders
 _pycache_/
 env/
-
+.idea/
 
 # Don't track these files
 token.json
-
+.idea/
 
 # Compiled source #
 ###################
