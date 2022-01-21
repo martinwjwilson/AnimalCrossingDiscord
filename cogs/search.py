@@ -1,5 +1,5 @@
-import discord
-from discord.ext import commands
+import disnake
+from disnake.ext import commands
 import utils
 import sqlite3
 import typing
@@ -141,8 +141,8 @@ class Search(commands.Cog):
     #     for critter in critters_available_list:
     #         description_b = description_b + f"\n{critter}"
     #
-    #     embed_f = discord.Embed(title = "List of Fish available this month", description = description_f)
-    #     embed_b = discord.Embed(title = "List of Bugs available this month", description = description_b)
+    #     embed_f = disnake.Embed(title = "List of Fish available this month", description = description_f)
+    #     embed_b = disnake.Embed(title = "List of Bugs available this month", description = description_b)
     #     await ctx.send(embed = embed_f)
     #     await ctx.send(embed = embed_b)
 
@@ -245,8 +245,8 @@ class Search(commands.Cog):
     #         await ctx.send("Invalid hemisphere. Must be either `n` or `s`. (No input will default to `n`)")
     #         return
     #     # create embeds
-    #     embed_f = discord.Embed(title = "List of Fish leaving this month", description = await self.list_of_critter_changing("fish", change_type, hemisphere))
-    #     embed_b = discord.Embed(title = "List of Bugs leaving this month", description = await self.list_of_critter_changing("bugs", change_type, hemisphere))
+    #     embed_f = disnake.Embed(title = "List of Fish leaving this month", description = await self.list_of_critter_changing("fish", change_type, hemisphere))
+    #     embed_b = disnake.Embed(title = "List of Bugs leaving this month", description = await self.list_of_critter_changing("bugs", change_type, hemisphere))
     #     # send embeds
     #     await ctx.send(embed = embed_f)
     #     await ctx.send(embed = embed_b)
@@ -331,7 +331,7 @@ class Search(commands.Cog):
         If input is provided then find names beginning with the input
         """
         fish_names = await self.all_critter_by_species("Fish", starts_with)  # get a list of all fish names
-        embed = discord.Embed(title="Fish search", description=fish_names)
+        embed = disnake.Embed(title="Fish search", description=fish_names)
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -341,7 +341,7 @@ class Search(commands.Cog):
         If input is provided then find names beginning with the input
         """
         bug_names = await self.all_critter_by_species("Bug", starts_with)  # get a list of all bug names
-        embed = discord.Embed(title="Bug search", description=bug_names)
+        embed = disnake.Embed(title="Bug search", description=bug_names)
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -356,7 +356,7 @@ class Search(commands.Cog):
             critter = await self.create_critter(list(c.fetchone()))
             if critter:  # if there is a match from the DB
                 # create embed
-                embed = discord.Embed(title=f'{critter.name} Info',
+                embed = disnake.Embed(title=f'{critter.name} Info',
                                       description=f"Everything you need to know about the {critter.name}")
                 embed.add_field(name="Name:", value=critter.name, inline=False)
                 embed.add_field(name="Type:", value=critter.species, inline=False)

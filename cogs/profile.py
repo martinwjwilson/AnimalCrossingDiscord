@@ -1,6 +1,6 @@
-import discord
-from discord.ext import commands
-import utils
+import sqlite3
+import disnake
+from disnake.ext import commands
 import asyncio
 
 # db
@@ -15,7 +15,7 @@ class Profile(commands.Cog):
     # ask a user for their name
     async def get_info(self, ctx, question):
         def dm_check(m):  # check that the message was a DM from the correct user
-            return m.channel.type == discord.channel.ChannelType.private and m.author == ctx.author
+            return m.channel.type == disnake.ChannelType.private and m.author == ctx.author
 
         await ctx.author.send(question)  # send the user a dm
         try:
