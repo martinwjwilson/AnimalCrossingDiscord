@@ -1,12 +1,12 @@
-from datetime import date
-from dateutil.relativedelta import relativedelta
 import disnake
 from disnake.ext import commands
 import utils
 import sqlite3
 import typing
-from models.critter import Critter
-from models.hemisphere import Hemisphere
+from ..models.critter import Critter
+from ..models.hemisphere import Hemisphere
+# from ..models.critter import Critter
+# from ..models.hemisphere import Hemisphere
 
 # db
 conn = sqlite3.connect("ailurus.db")
@@ -234,11 +234,14 @@ class Search(commands.Cog):
         Displays lists of all critters of the specified type that are arriving or leaving
         """
         # get a list of all critters
+        print("Got here 4")
         all_critters_list = await self.list_of_critter_changing(self, critter_type, change_type, hemisphere)
         # get a list of all critter names as strings
+        print("Got here 2")
         all_critters_string = await self.critter_list_to_string_of_names(all_critters_list)
         # create embeds
-        embed = discord.Embed(title=f"List of {critter_type} leaving this month",
+        print("Got here 3")
+        embed = disnake.Embed(title=f"List of {critter_type} leaving this month",
                               description=all_critters_string)
         # send embed
         await ctx.send(embed=embed)
@@ -252,6 +255,7 @@ class Search(commands.Cog):
         hemisphere = Hemisphere.convert_text_to_hemisphere(user_hemisphere)
         # Display lists of the critters arriving
         # fish
+        print("Got here 1")
         await self.display_list_of_changing_critters(self, ctx, "fish", "arriving", hemisphere)
         # bugs
         await self.display_list_of_changing_critters(self, ctx, "bugs", "arriving", hemisphere)
@@ -334,7 +338,7 @@ class Search(commands.Cog):
         """
         fish_list = await self.all_critter_by_species("Fish", starts_with)  # get a list of all fish
         fish_names = await self.critter_list_to_string_of_names(fish_list)  # convert fish to list of their names
-        embed = discord.Embed(title="Fish search", description=fish_names)
+        embed = disnake.Embed(title="Fish search", description=fish_names)
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -345,7 +349,7 @@ class Search(commands.Cog):
         """
         bug_list = await self.all_critter_by_species("Bug", starts_with)  # get a list of all bug names
         bug_names = await self.critter_list_to_string_of_names(bug_list)
-        embed = discord.Embed(title="Bug search", description=bug_names)
+        embed = disnake.Embed(title="Bug search", description=bug_names)
         await ctx.send(embed=embed)
 
     @commands.command()
