@@ -3,10 +3,9 @@ from disnake.ext import commands
 import utils
 import sqlite3
 import typing
-from ..models.critter import Critter
-from ..models.hemisphere import Hemisphere
-# from ..models.critter import Critter
-# from ..models.hemisphere import Hemisphere
+
+from critter import Critter
+from hemisphere import Hemisphere
 
 # db
 conn = sqlite3.connect("ailurus.db")

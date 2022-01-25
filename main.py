@@ -72,7 +72,7 @@ async def stop(ctx):
 @commands.check(utils.check_if_it_is_dev)
 async def load(ctx, extension):
     try:
-        bot.load_extension(f"cogs.{extension}")
+        bot.load_extension(extension)
         print(f"Loaded {extension}.\n")
     except Exception as error:
         print(f"{extension} could not be loaded. [{error}]")
@@ -83,7 +83,7 @@ async def load(ctx, extension):
 @commands.check(utils.check_if_it_is_dev)
 async def unload(ctx, extension):
     try:
-        bot.unload_extension(f"cogs.{extension}")
+        bot.unload_extension(extension)
         print(f"Unloaded {extension}.\n")
     except Exception as error:
         print(f"{extension} could not be unloaded. [{error}]")
@@ -94,7 +94,7 @@ async def unload(ctx, extension):
 @commands.check(utils.check_if_it_is_dev)
 async def reload(ctx, extension):
     try:
-        bot.reload_extension(f"cogs.{extension}")
+        bot.reload_extension(extension)
         print(f"Reloaded {extension}.\n")
     except Exception as error:
         print(f"{extension} could not be reloaded. [{error}]")
@@ -104,7 +104,7 @@ async def reload(ctx, extension):
 if __name__ == '__main__':
     for extension in extensions:
         try:
-            bot.load_extension(f"cogs.{extension}")
+            bot.load_extension(extension)
             print(f"Loaded cog: {extension}")
         except Exception as error:
             print(f"{extension} could not be loaded. [{error}]")
