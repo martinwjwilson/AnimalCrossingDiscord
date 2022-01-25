@@ -233,13 +233,10 @@ class Search(commands.Cog):
         Displays lists of all critters of the specified type that are arriving or leaving
         """
         # get a list of all critters
-        print("Got here 4")
         all_critters_list = await self.list_of_critter_changing(self, critter_type, change_type, hemisphere)
         # get a list of all critter names as strings
-        print("Got here 2")
         all_critters_string = await self.critter_list_to_string_of_names(all_critters_list)
         # create embeds
-        print("Got here 3")
         embed = disnake.Embed(title=f"List of {critter_type} leaving this month",
                               description=all_critters_string)
         # send embed
