@@ -251,10 +251,9 @@ class Search(commands.Cog):
         hemisphere = Hemisphere.convert_text_to_hemisphere(user_hemisphere)
         # Display lists of the critters arriving
         # fish
-        print("Got here 1")
-        await self.display_list_of_changing_critters(self, ctx, "fish", "arriving", hemisphere)
+        await self.display_list_of_changing_critters(self, ctx, "Fish", "arriving", hemisphere)
         # bugs
-        await self.display_list_of_changing_critters(self, ctx, "bugs", "arriving", hemisphere)
+        await self.display_list_of_changing_critters(self, ctx, "Bug", "arriving", hemisphere)
 
     # @commands.command()
     # async def leaving(self, ctx, hemisphere: typing.Optional[str] = "n"):
