@@ -211,7 +211,7 @@ class Search(commands.Cog):
         # check each critter against the current date
         for critter in list_of_critters:
             if await self.critter_fits_change_check(critter, change_type, hemisphere):
-                critters_available_list.append(critter.name)
+                critters_available_list.append(critter)
         return critters_available_list
 
     @staticmethod
@@ -237,7 +237,7 @@ class Search(commands.Cog):
         # get a list of all critter names as strings
         all_critters_string = await self.critter_list_to_string_of_names(all_critters_list)
         # create embeds
-        embed = disnake.Embed(title=f"List of {critter_type} leaving this month",
+        embed = disnake.Embed(title=f"List of {critter_type} {change_type} this month",
                               description=all_critters_string)
         # send embed
         await ctx.send(embed=embed)
@@ -305,8 +305,6 @@ class Search(commands.Cog):
     async def create_critter_list(critter_list: list) -> [Critter]:
         critter_class_list = []
         for critter in critter_list:
-            print("This is a critter")
-            print(critter)
             critter_class_list.append(Critter(
                 name=critter[0],
                 species=critter[1],

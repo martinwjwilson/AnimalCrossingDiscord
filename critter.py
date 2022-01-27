@@ -41,7 +41,7 @@ class Critter:
             return False
 
     @staticmethod
-    def availability_changing(self, months_to_check: [str], current_hemisphere: Hemisphere) -> bool:
+    def availability_changing(months_to_check: [str], current_hemisphere: Hemisphere) -> bool:
         """
         Takes a list of months and checks if any match the current month based on the hemisphere
         """
