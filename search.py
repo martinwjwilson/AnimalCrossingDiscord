@@ -3,7 +3,9 @@ from disnake.ext import commands
 import utils
 import sqlite3
 import typing
-from models.critter import Critter
+
+from critter import Critter
+from hemisphere import Hemisphere
 
 # db
 conn = sqlite3.connect("ailurus.db")
@@ -14,8 +16,22 @@ class Search(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    dictionary_of_all_months = {
+        "January": 1,
+        "February": 2,
+        "March": 3,
+        "April": 4,
+        "May": 5,
+        "June": 6,
+        "July": 7,
+        "August": 8,
+        "September": 9,
+        "October": 10,
+        "November": 11,
+        "December": 12}
+
     @staticmethod
-    async def format_input(input_string: str):
+    async def format_input(input_string: str) -> str:
         """
         Format a string to match the style of the db entries
         """
@@ -27,25 +43,26 @@ class Search(commands.Cog):
             output.append(word.capitalize())  # capitalise all lowercase words in list
         return " ".join(output)  # join words back together with a space between them
 
-    # async def month_list(self, start_month: str, end_month: str):
-    #     """
-    #     Return a list of months from the start month until the end month
-    #     """
-    #     dict_of_all_months = {
-    #         "January":1,
-    #         "February":2,
-    #         "March":3,
-    #         "April":4,
-    #         "May":5,
-    #         "June":6,
-    #         "July":7,
-    #         "August":8,
-    #         "September":9,
-    #         "October":10,
-    #         "November":11,
-    #         "December":12}
-    #     start_month_int = dict_of_all_months[start_month] # ' November'
-    #     end_month_int = dict_of_all_months[end_month]
+    async def month_list(self, start_month: str, end_month: str):
+        """
+        Return a list of months from the start month until the end month
+        """
+        dict_of_all_months = {
+            "January": 1,
+            "February": 2,
+            "March": 3,
+            "April": 4,
+            "May": 5,
+            "June": 6,
+            "July": 7,
+            "August": 8,
+            "September": 9,
+            "October": 10,
+            "November": 11,
+            "December": 12}
+        start_month_int = dict_of_all_months[start_month]  # 'November'
+        end_month_int = dict_of_all_months[end_month]
+
     #     list_of_months_available = []
     #     # if start month is less than end month, include everything greater than start month and less than or = end month
     #     if start_month_int < end_month_int:
@@ -68,36 +85,36 @@ class Search(commands.Cog):
         # check if the critter is all year round
         if critter_month.startswith("Year"):
             return True
-    #     # get this months month
-    #     current_month = date.today().strftime("%B")
-    #     northern_months = critter_month.split("/")[0] # split the critter month into Northern and Southern
-    #     northern_months = northern_months.split("(")[0].strip() # remove the (northern) section
-    #
-    #     if "," in northern_months: # if critter is available twice a year, split it up
-    #         periods = northern_months.split(",")
-    #         period_1 = periods[0]
-    #         period_2 = periods[1]
-    #         # get start and end months from each period
-    #         period_1 = period_1.split("-")
-    #         start_month_1 = period_1[0].strip()
-    #         end_month_1 = period_1[1].strip()
-    #         if "-" in period_2:
-    #             period_2 = period_2.split("-")
-    #         else: # if it's a ladybug... :v
-    #             period_2 = [period_2, period_2]
-    #         start_month_2 = period_2[0].strip()
-    #         end_month_2 = period_2[1].strip()
-    #         if (current_month in await self.month_list(start_month_1, end_month_1)) or (current_month in await self.month_list(start_month_2.strip(), end_month_2)):
-    #             return True
-    #     elif "-" in northern_months: # there is one period per year
-    #         # get start and end months
-    #         start_month, end_month = northern_months.split("-")
-    #         # generate a list of months critter is available
-    #         if current_month in await self.month_list(start_month, end_month):
-    #             return True
-    #     else: # it is available for a single month per year
-    #         if current_month == northern_months:
-    #             return True
+        #     # get this months month
+        #     current_month = date.today().strftime("%B")
+        #     northern_months = critter_month.split("/")[0] # split the critter month into Northern and Southern
+        #     northern_months = northern_months.split("(")[0].strip() # remove the (northern) section
+        #
+        #     if "," in northern_months: # if critter is available twice a year, split it up
+        #         periods = northern_months.split(",")
+        #         period_1 = periods[0]
+        #         period_2 = periods[1]
+        #         # get start and end months from each period
+        #         period_1 = period_1.split("-")
+        #         start_month_1 = period_1[0].strip()
+        #         end_month_1 = period_1[1].strip()
+        #         if "-" in period_2:
+        #             period_2 = period_2.split("-")
+        #         else: # if it's a ladybug... :v
+        #             period_2 = [period_2, period_2]
+        #         start_month_2 = period_2[0].strip()
+        #         end_month_2 = period_2[1].strip()
+        #         if (current_month in await self.month_list(start_month_1, end_month_1)) or (current_month in await self.month_list(start_month_2.strip(), end_month_2)):
+        #             return True
+        #     elif "-" in northern_months: # there is one period per year
+        #         # get start and end months
+        #         start_month, end_month = northern_months.split("-")
+        #         # generate a list of months critter is available
+        #         if current_month in await self.month_list(start_month, end_month):
+        #             return True
+        #     else: # it is available for a single month per year
+        #         if current_month == northern_months:
+        #             return True
         return False
 
     @staticmethod
@@ -133,6 +150,7 @@ class Search(commands.Cog):
         description_f = ""
         description_b = ""
         # get a list of all fish available this month
+
     #     critters_available_list = await self.this_month_critter_filter(fish_list)
     #     for critter in critters_available_list:
     #         description_f = description_f + f"\n{critter}"
@@ -170,102 +188,81 @@ class Search(commands.Cog):
     #         else:
     #             return False
 
-    # async def critter_fits_change_check(self, critter_month: str, change_type: str, hemisphere: str) -> bool:
-    #     """
-    #     Check if a critter follows the change being checked against
-    #     Return a bool representing if the critter does or doesn't follow the change
-    #     e.g. a critter leaves in June and the check is for all critters leaving in June. Return True
-    #     """
-    #     # get the current momnth in the desired format
-    #     current_month = date.today().strftime("%B")
-    #     if critter_month == "Year-round (Northern and Southern)": # check if the critter is available all year
-    #         return False
-    #     critter_northern_period, critter_southern_period = critter_month.split("/") # split the critter month into Northern and Southern
-    #     critter_northern_months = critter_northern_period.split("(")[0].strip() # remove the word Northern
-    #     critter_southern_months = critter_southern_period.split("(")[0].strip()# remove the word Southern
-    #     # check if the current month matches the critter availability
-    #     if hemisphere == "n": # Northern
-    #         if "," in critter_northern_months: # if critter is available in two periods per year
-    #             return await self.critter_available_twice_per_year(current_month, critter_northern_months, change_type)
-    #         elif "-" in critter_northern_months: # there is one period per year
-    #             return await self.critter_available_once_per_year(current_month, critter_northern_months, change_type)
-    #         elif current_month == critter_northern_months: # critter is available one month of the year
-    #             return True
-    #         return False
-    #     elif hemisphere == "s": # Southern
-    #         if "," in critter_southern_months: # if critter is available in two periods per year
-    #             return await self.critter_available_twice_per_year(current_month, critter_southern_months, change_type)
-    #         elif "-" in critter_southern_months: # there is one period per year
-    #             return await self.critter_available_once_per_year(current_month, critter_southern_months, change_type)
-    #         elif current_month == critter_southern_months: # critter is available one month of the year
-    #             return True
-    #         return False
+    async def critter_fits_change_check(self, critter: Critter, change_type: str, hemisphere: Hemisphere) -> bool:
+        """
+        Check if a critter follows the change being checked against
+        Return a bool representing if the critter does or doesn't follow the change
+        e.g. a critter leaves in June and the check is for all critters leaving in June. Return True
+        """
+        # check if the current month matches the critter availability
+        if change_type == "arriving" and critter.is_arriving(hemisphere):
+            return True
+        elif change_type == "leaving" and critter.is_leaving(hemisphere):
+            return True
+        else:
+            return False
 
-    # async def critter_filter_by_changing(self, list_of_critters: list, change_type: str, hemisphere: str) -> list:
-    #     """
-    #     Filters list of all bugs and fish to ones arriving or leaving this month
-    #     """
-    #     critters_available_list = [] # list of critters available this month
-    #     # check each critter against the current date
-    #     for critter in list_of_critters:
-    #         # check if the critter is a fish or a bug as db tables are different
-    #         if critter[1] == "Fish":
-    #             if await self.critter_fits_change_check(critter[6], change_type, hemisphere):
-    #                 critters_available_list.append(critter[0])
-    #         else:
-    #             if await self.critter_fits_change_check(critter[5], change_type, hemisphere):
-    #                 critters_available_list.append(critter[0])
-    #     return critters_available_list
+    async def critter_filter_by_changing(self, list_of_critters: [Critter], change_type: str, hemisphere: Hemisphere) -> [
+        Critter]:
+        """
+        Filters list of all bugs and fish to ones arriving or leaving this month
+        """
+        critters_available_list = []  # list of critters available this month
+        # check each critter against the current date
+        for critter in list_of_critters:
+            if await self.critter_fits_change_check(critter, change_type, hemisphere):
+                critters_available_list.append(critter)
+        return critters_available_list
 
-    # async def list_of_critter_changing(self, species: str, change_type: str, hemisphere: str) -> str:
-    #     """
-    #     Formats and returns a str of all critters of a given species leaving or arriving depending on the command called
-    #     """
-    #     # get the full list of species
-    #     c.execute(utils.search_all_critters(species, ""))
-    #     all_critter_list = list(c.fetchall())
-    #     # check if arriving or leaving command was called
-    #     if change_type == "arriving":
-    #         critters_available_list = await self.critter_filter_by_changing(all_critter_list, change_type, hemisphere)
-    #     elif change_type == "leaving":
-    #         critters_available_list = await self.critter_filter_by_changing(all_critter_list, change_type, hemisphere)
-    #     # convert the list into a string
-    #     critter_string = ""
-    #     for critter in critters_available_list:
-    #         critter_string = critter_string + f"\n{critter}"
-    #     # return the finalised string
-    #     return critter_string
+    @staticmethod
+    async def list_of_critter_changing(self, species: str, change_type: str, hemisphere: Hemisphere) -> [Critter]:
+        """
+        Formats and returns a list of all critters of a given species leaving or arriving depending on the command called
+        """
+        # get the full list of critters of the specified species
+        c.execute(utils.search_all_critters(species, ""))
+        all_critter_list = await self.create_critter_list(list(c.fetchall()))
+        # filter the list to only show changing critters
+        critters_available_list = await self.critter_filter_by_changing(all_critter_list, change_type, hemisphere)
+        print(critters_available_list)
+        return critters_available_list
 
-    # async def arriving_or_leaving(self, ctx, change_type: str, hemisphere: str):
-    #     """
-    #     Display a list of all fish and bugs arriving in the current month
-    #     """
-    #     # check that hemisphere is valid
-    #     if hemisphere != "n" and hemisphere != "s":
-    #         await ctx.send("Invalid hemisphere. Must be either `n` or `s`. (No input will default to `n`)")
-    #         return
-    #     # create embeds
-    #     embed_f = disnake.Embed(title = "List of Fish leaving this month", description = await self.list_of_critter_changing("fish", change_type, hemisphere))
-    #     embed_b = disnake.Embed(title = "List of Bugs leaving this month", description = await self.list_of_critter_changing("bugs", change_type, hemisphere))
-    #     # send embeds
-    #     await ctx.send(embed = embed_f)
-    #     await ctx.send(embed = embed_b)
+    @staticmethod
+    async def display_list_of_changing_critters(self, ctx, critter_type, change_type: str, hemisphere: Hemisphere):
+        """
+        Displays lists of all critters of the specified type that are arriving or leaving
+        """
+        # get a list of all critters
+        all_critters_list = await self.list_of_critter_changing(self, critter_type, change_type, hemisphere)
+        # get a list of all critter names as strings
+        all_critters_string = await self.critter_list_to_string_of_names(all_critters_list)
+        # create embeds
+        embed = disnake.Embed(title=f"List of {critter_type} {change_type} this month",
+                              description=all_critters_string)
+        # send embed
+        await ctx.send(embed=embed)
 
-    # @commands.command()
-    # async def arriving(self, ctx, hemisphere: typing.Optional[str] = "n"):
-    #     """
-    #     Display a list of all fish and bugs arriving in the current month
-    #     """
-    #     await self.arriving_or_leaving(ctx, "arriving", hemisphere)
+    @commands.command()
+    async def arriving(self, ctx, user_hemisphere: typing.Optional[str] = "n"):
+        """
+        Display a list of all fish and bugs arriving in the current month
+        """
+        # Convert the user input to work out which hemisphere is being checked
+        hemisphere = Hemisphere.convert_text_to_hemisphere(user_hemisphere)
+        # Display lists of the critters arriving
+        # fish
+        await self.display_list_of_changing_critters(self, ctx, "Fish", "arriving", hemisphere)
+        # bugs
+        await self.display_list_of_changing_critters(self, ctx, "Bug", "arriving", hemisphere)
 
     # @commands.command()
     # async def leaving(self, ctx, hemisphere: typing.Optional[str] = "n"):
     #     """
-    #     Display a list of all fish and bugs leaving at the end of the current month
+    #     Post a list of all fish and bugs leaving at the end of the current month
     #     """
-    #     await self.arriving_or_leaving(ctx, "leaving", hemisphere)
+    #     await self.availability_changing(self, ctx, "leaving", hemisphere)
 
-    async def all_critter_by_species(self, species_type: str, starts_with: str):
+    async def all_critter_by_species(self, species_type: str, starts_with: str) -> [Critter]:
         """
         Get a list from the database of all critters of a given species
         Restrict the search to names starting with the 'starts_with' variable if provided
@@ -276,6 +273,10 @@ class Search(commands.Cog):
             starts_with = f"AND critter_name LIKE '{starts_with}%'"  # add sql for search
         c.execute(utils.search_all_critters(species_type, starts_with))  # Execute the SQL check
         critter_list = await self.create_critter_list(list(c.fetchall()))
+        return critter_list
+
+    @staticmethod
+    async def critter_list_to_string_of_names(critter_list: [Critter]) -> str:
         critter_names = ""
         for critter in critter_list:
             critter_names = critter_names + f"{critter.name}\n"
@@ -304,8 +305,6 @@ class Search(commands.Cog):
     async def create_critter_list(critter_list: list) -> [Critter]:
         critter_class_list = []
         for critter in critter_list:
-            print("This is a critter")
-            print(critter)
             critter_class_list.append(Critter(
                 name=critter[0],
                 species=critter[1],
@@ -330,7 +329,8 @@ class Search(commands.Cog):
         Display a list of all fish by name
         If input is provided then find names beginning with the input
         """
-        fish_names = await self.all_critter_by_species("Fish", starts_with)  # get a list of all fish names
+        fish_list = await self.all_critter_by_species("Fish", starts_with)  # get a list of all fish
+        fish_names = await self.critter_list_to_string_of_names(fish_list)  # convert fish to list of their names
         embed = disnake.Embed(title="Fish search", description=fish_names)
         await ctx.send(embed=embed)
 
@@ -340,7 +340,8 @@ class Search(commands.Cog):
         Display a list of all bugs by name
         If input is provided then find names beginning with the input
         """
-        bug_names = await self.all_critter_by_species("Bug", starts_with)  # get a list of all bug names
+        bug_list = await self.all_critter_by_species("Bug", starts_with)  # get a list of all bug names
+        bug_names = await self.critter_list_to_string_of_names(bug_list)
         embed = disnake.Embed(title="Bug search", description=bug_names)
         await ctx.send(embed=embed)
 
