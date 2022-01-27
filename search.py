@@ -143,26 +143,21 @@ class Search(commands.Cog):
         """
         # get all fish
         c.execute(utils.search_all_critters("Fish", ""))  # Execute the SQL check
-        fish_list = list(c.fetchall())
+        fish_list = await self.create_critter_list(list(c.fetchall()))
         # get all bugs
         c.execute(utils.search_all_critters("Bugs", ""))  # Execute the SQL check
-        bug_list = list(c.fetchall())
-        description_f = ""
-        description_b = ""
+        bug_list = await self.create_critter_list(list(c.fetchall()))
         # get a list of all fish available this month
-
-    #     critters_available_list = await self.this_month_critter_filter(fish_list)
-    #     for critter in critters_available_list:
-    #         description_f = description_f + f"\n{critter}"
-    #     # get a list of all bugs available this month
-    #     critters_available_list = await self.this_month_critter_filter(bug_list)
-    #     for critter in critters_available_list:
-    #         description_b = description_b + f"\n{critter}"
-    #
-    #     embed_f = disnake.Embed(title = "List of Fish available this month", description = description_f)
-    #     embed_b = disnake.Embed(title = "List of Bugs available this month", description = description_b)
-    #     await ctx.send(embed = embed_f)
-    #     await ctx.send(embed = embed_b)
+        fish_available_list = await self.this_month_critter_filter(fish_list)
+        description_f = await self.critter_list_to_string_of_names(fish_available_list)
+        # get a list of all bugs available this month
+        bug_available_list = await self.this_month_critter_filter(bug_list)
+        description_b = await self.critter_list_to_string_of_names(bug_available_list)
+        # create embeds
+        embed_f = disnake.Embed(title="List of Fish available this month", description=description_f)
+        embed_b = disnake.Embed(title="List of Bugs available this month", description=description_b)
+        await ctx.send(embed=embed_f)
+        await ctx.send(embed=embed_b)
 
     # async def critter_available_twice_per_year(self, current_month: str, critter_months: str, change_type: str) -> bool:
     #     periods = critter_months.split(",")
