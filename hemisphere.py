@@ -9,7 +9,7 @@ class Hemisphere(Enum):
     SOUTH = "s"
 
     def calculate_current_month(self) -> str:
-        if self == self.NORTH.value:
+        if self == self.NORTH:
             return datetime.datetime.now().strftime("%B")
         else:
             return (datetime.datetime.now() + relativedelta(months=6)).strftime("%B")
