@@ -1,4 +1,7 @@
+from datetime import datetime
+
 import disnake
+from dateutil.relativedelta import relativedelta
 from disnake.ext import commands
 import utils
 import sqlite3
@@ -78,43 +81,31 @@ class Search(commands.Cog):
     #     return list_of_months_available
 
     @staticmethod
-    async def availability_review(self, critter_month: str):
+    async def availability_review(critter: Critter):
         """
         Check the availability for an individual critter
         """
-        # check if the critter is all year round
-        if critter_month.startswith("Year"):
+        # check if the critter is available all year
+        if critter.start_month == "All Year":
             return True
-        #     # get this months month
-        #     current_month = date.today().strftime("%B")
-        #     northern_months = critter_month.split("/")[0] # split the critter month into Northern and Southern
-        #     northern_months = northern_months.split("(")[0].strip() # remove the (northern) section
-        #
-        #     if "," in northern_months: # if critter is available twice a year, split it up
-        #         periods = northern_months.split(",")
-        #         period_1 = periods[0]
-        #         period_2 = periods[1]
-        #         # get start and end months from each period
-        #         period_1 = period_1.split("-")
-        #         start_month_1 = period_1[0].strip()
-        #         end_month_1 = period_1[1].strip()
-        #         if "-" in period_2:
-        #             period_2 = period_2.split("-")
-        #         else: # if it's a ladybug... :v
-        #             period_2 = [period_2, period_2]
-        #         start_month_2 = period_2[0].strip()
-        #         end_month_2 = period_2[1].strip()
-        #         if (current_month in await self.month_list(start_month_1, end_month_1)) or (current_month in await self.month_list(start_month_2.strip(), end_month_2)):
-        #             return True
-        #     elif "-" in northern_months: # there is one period per year
-        #         # get start and end months
-        #         start_month, end_month = northern_months.split("-")
-        #         # generate a list of months critter is available
-        #         if current_month in await self.month_list(start_month, end_month):
-        #             return True
-        #     else: # it is available for a single month per year
-        #         if current_month == northern_months:
-        #             return True
+        # get the current month
+        current_month = Hemisphere.calculate_current_month(Hemisphere.NORTH)
+        # check the current month against the start months
+        if critter.start_month == current_month or critter.alt_start_month == current_month:
+            return True
+        # check if the current month is within the start and end months
+        temp_month = datetime.strptime(critter.start_month, '%B')
+        while temp_month.strftime("%B") != critter.end_month:
+            temp_month = temp_month + relativedelta(months=1)
+            if temp_month.strftime("%B") == current_month:
+                return True
+        # check if the current month is withing the alternate start and end months
+        if critter.alt_end_month != "None":
+            temp_month = datetime.strptime(critter.alt_start_month, '%B')
+            while temp_month.strftime("%B") != critter.alt_end_month:
+                temp_month = temp_month + relativedelta(months=1)
+                if temp_month.strftime("%B") == current_month:
+                    return True
         return False
 
     @staticmethod
@@ -138,7 +129,7 @@ class Search(commands.Cog):
         c.execute(utils.search_all_critters("Fish", ""))  # Execute the SQL check
         fish_list = await self.create_critter_list(list(c.fetchall()))
         # get all bugs
-        c.execute(utils.search_all_critters("Bugs", ""))  # Execute the SQL check
+        c.execute(utils.search_all_critters("Bug", ""))  # Execute the SQL check
         bug_list = await self.create_critter_list(list(c.fetchall()))
         # get a list of all fish available this month
         fish_available_list = await self.this_month_critter_filter(self, fish_list)
