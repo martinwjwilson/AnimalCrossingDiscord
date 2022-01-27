@@ -224,7 +224,6 @@ class Search(commands.Cog):
         all_critter_list = await self.create_critter_list(list(c.fetchall()))
         # filter the list to only show changing critters
         critters_available_list = await self.critter_filter_by_changing(all_critter_list, change_type, hemisphere)
-        print(critters_available_list)
         return critters_available_list
 
     @staticmethod
@@ -255,12 +254,18 @@ class Search(commands.Cog):
         # bugs
         await self.display_list_of_changing_critters(self, ctx, "Bug", "arriving", hemisphere)
 
-    # @commands.command()
-    # async def leaving(self, ctx, hemisphere: typing.Optional[str] = "n"):
-    #     """
-    #     Post a list of all fish and bugs leaving at the end of the current month
-    #     """
-    #     await self.availability_changing(self, ctx, "leaving", hemisphere)
+    @commands.command()
+    async def leaving(self, ctx, user_hemisphere: typing.Optional[str] = "n"):
+        """
+        Display a list of all fish and bugs leaving in the current month
+        """
+        # Convert the user input to work out which hemisphere is being checked
+        hemisphere = Hemisphere.convert_text_to_hemisphere(user_hemisphere)
+        # Display lists of the critters arriving
+        # fish
+        await self.display_list_of_changing_critters(self, ctx, "Fish", "leaving", hemisphere)
+        # bugs
+        await self.display_list_of_changing_critters(self, ctx, "Bug", "leaving", hemisphere)
 
     async def all_critter_by_species(self, species_type: str, starts_with: str) -> [Critter]:
         """
