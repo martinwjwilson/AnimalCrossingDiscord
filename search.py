@@ -19,20 +19,6 @@ class Search(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    dictionary_of_all_months = {
-        "January": 1,
-        "February": 2,
-        "March": 3,
-        "April": 4,
-        "May": 5,
-        "June": 6,
-        "July": 7,
-        "August": 8,
-        "September": 9,
-        "October": 10,
-        "November": 11,
-        "December": 12}
-
     @staticmethod
     async def format_input(input_string: str) -> str:
         """
@@ -108,30 +94,6 @@ class Search(commands.Cog):
         embed_b = disnake.Embed(title="List of Bugs available this month", description=description_b)
         await ctx.send(embed=embed_f)
         await ctx.send(embed=embed_b)
-
-    # async def critter_available_twice_per_year(self, current_month: str, critter_months: str, change_type: str) -> bool:
-    #     periods = critter_months.split(",")
-    #     period_1 = periods[0]
-    #     period_2 = periods[1]
-    #     if((await self.critter_available_once_per_year(current_month, period_1, change_type)) or (await self.critter_available_once_per_year(current_month, period_2, change_type))):
-    #         return True
-    #     else:
-    #         return False
-
-    # async def critter_available_once_per_year(self, current_month: str, critter_months: str, change_type: str) -> bool:
-    #     # get start and end months
-    #     start_month, end_month = critter_months.split("-")
-    #     # check change type
-    #     if change_type == "arriving":
-    #         if current_month == start_month:
-    #             return True
-    #         else:
-    #             return False
-    #     elif change_type == "leaving":
-    #         if current_month == end_month:
-    #             return True
-    #         else:
-    #             return False
 
     async def critter_fits_change_check(self, critter: Critter, change_type: str, hemisphere: Hemisphere) -> bool:
         """
