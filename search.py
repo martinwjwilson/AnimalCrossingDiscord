@@ -46,40 +46,6 @@ class Search(commands.Cog):
             output.append(word.capitalize())  # capitalise all lowercase words in list
         return " ".join(output)  # join words back together with a space between them
 
-    async def month_list(self, start_month: str, end_month: str):
-        """
-        Return a list of months from the start month until the end month
-        """
-        dict_of_all_months = {
-            "January": 1,
-            "February": 2,
-            "March": 3,
-            "April": 4,
-            "May": 5,
-            "June": 6,
-            "July": 7,
-            "August": 8,
-            "September": 9,
-            "October": 10,
-            "November": 11,
-            "December": 12}
-        start_month_int = dict_of_all_months[start_month]  # 'November'
-        end_month_int = dict_of_all_months[end_month]
-
-    #     list_of_months_available = []
-    #     # if start month is less than end month, include everything greater than start month and less than or = end month
-    #     if start_month_int < end_month_int:
-    #         for month in dict_of_all_months:
-    #             if dict_of_all_months[month] >= start_month_int and dict_of_all_months[month] <= end_month_int:
-    #                 list_of_months_available.append(month)
-    #     # if end month is less than start month, include everything greater or equal to start month and less than or = end month
-    #     else:
-    #         for month in dict_of_all_months:
-    #             if dict_of_all_months[month] >= start_month_int or dict_of_all_months[month] <= end_month_int:
-    #                 list_of_months_available.append(month)
-    #     # check if current month is in list
-    #     return list_of_months_available
-
     @staticmethod
     async def availability_review(critter: Critter):
         """
