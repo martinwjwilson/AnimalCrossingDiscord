@@ -118,22 +118,15 @@ class Search(commands.Cog):
         return False
 
     @staticmethod
-    async def this_month_critter_filter(self, list_of_critters: list):
+    async def this_month_critter_filter(self, list_of_critters: [Critter]) -> [Critter]:
         """
-        filters list of all bugs and fish to ones available this month
+        filters list of critters to ones available this month
         """
         critters_available_list = []  # list of critters available this month
         # check each critter against the current date
         for critter in list_of_critters:
-            # check if the critter is a fish or a bug
-            if critter[1] == "Fish":
-                # check availability this month
-                if await self.availability_review(critter[6]):
-                    critters_available_list.append(critter[0])
-            else:
-                # check availability this month
-                if await self.availability_review(critter[5]):
-                    critters_available_list.append(critter[0])
+            if await self.availability_review(critter):
+                critters_available_list.append(critter)
         return critters_available_list
 
     @commands.command()
@@ -148,10 +141,10 @@ class Search(commands.Cog):
         c.execute(utils.search_all_critters("Bugs", ""))  # Execute the SQL check
         bug_list = await self.create_critter_list(list(c.fetchall()))
         # get a list of all fish available this month
-        fish_available_list = await self.this_month_critter_filter(fish_list)
+        fish_available_list = await self.this_month_critter_filter(self, fish_list)
         description_f = await self.critter_list_to_string_of_names(fish_available_list)
         # get a list of all bugs available this month
-        bug_available_list = await self.this_month_critter_filter(bug_list)
+        bug_available_list = await self.this_month_critter_filter(self, bug_list)
         description_b = await self.critter_list_to_string_of_names(bug_available_list)
         # create embeds
         embed_f = disnake.Embed(title="List of Fish available this month", description=description_f)
