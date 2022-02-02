@@ -95,7 +95,8 @@ class Search(commands.Cog):
         await ctx.send(embed=embed_f)
         await ctx.send(embed=embed_b)
 
-    async def critter_fits_change_check(self, critter: Critter, change_type: str, hemisphere: Hemisphere) -> bool:
+    @staticmethod
+    async def critter_fits_change_check(critter: Critter, change_type: str, hemisphere: Hemisphere) -> bool:
         """
         Check if a critter follows the change being checked against
         Return a bool representing if the critter does or doesn't follow the change
@@ -109,8 +110,8 @@ class Search(commands.Cog):
         else:
             return False
 
-    async def critter_filter_by_changing(self, list_of_critters: [Critter], change_type: str, hemisphere: Hemisphere) -> [
-        Critter]:
+    async def critter_filter_by_changing(self, list_of_critters: [Critter], change_type: str,
+                                         hemisphere: Hemisphere) -> [Critter]:
         """
         Filters list of all bugs and fish to ones arriving or leaving this month
         """
@@ -124,7 +125,7 @@ class Search(commands.Cog):
     @staticmethod
     async def list_of_critter_changing(self, species: str, change_type: str, hemisphere: Hemisphere) -> [Critter]:
         """
-        Formats and returns a list of all critters of a given species leaving or arriving depending on the command called
+        Formats and returns a list of all critters of a given species leaving or arriving
         """
         # get the full list of critters of the specified species
         c.execute(utils.search_all_critters(species, ""))
