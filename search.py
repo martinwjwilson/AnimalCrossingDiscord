@@ -19,20 +19,6 @@ class Search(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    dictionary_of_all_months = {
-        "January": 1,
-        "February": 2,
-        "March": 3,
-        "April": 4,
-        "May": 5,
-        "June": 6,
-        "July": 7,
-        "August": 8,
-        "September": 9,
-        "October": 10,
-        "November": 11,
-        "December": 12}
-
     @staticmethod
     async def format_input(input_string: str) -> str:
         """
@@ -109,31 +95,8 @@ class Search(commands.Cog):
         await ctx.send(embed=embed_f)
         await ctx.send(embed=embed_b)
 
-    # async def critter_available_twice_per_year(self, current_month: str, critter_months: str, change_type: str) -> bool:
-    #     periods = critter_months.split(",")
-    #     period_1 = periods[0]
-    #     period_2 = periods[1]
-    #     if((await self.critter_available_once_per_year(current_month, period_1, change_type)) or (await self.critter_available_once_per_year(current_month, period_2, change_type))):
-    #         return True
-    #     else:
-    #         return False
-
-    # async def critter_available_once_per_year(self, current_month: str, critter_months: str, change_type: str) -> bool:
-    #     # get start and end months
-    #     start_month, end_month = critter_months.split("-")
-    #     # check change type
-    #     if change_type == "arriving":
-    #         if current_month == start_month:
-    #             return True
-    #         else:
-    #             return False
-    #     elif change_type == "leaving":
-    #         if current_month == end_month:
-    #             return True
-    #         else:
-    #             return False
-
-    async def critter_fits_change_check(self, critter: Critter, change_type: str, hemisphere: Hemisphere) -> bool:
+    @staticmethod
+    async def critter_fits_change_check(critter: Critter, change_type: str, hemisphere: Hemisphere) -> bool:
         """
         Check if a critter follows the change being checked against
         Return a bool representing if the critter does or doesn't follow the change
@@ -147,8 +110,8 @@ class Search(commands.Cog):
         else:
             return False
 
-    async def critter_filter_by_changing(self, list_of_critters: [Critter], change_type: str, hemisphere: Hemisphere) -> [
-        Critter]:
+    async def critter_filter_by_changing(self, list_of_critters: [Critter], change_type: str,
+                                         hemisphere: Hemisphere) -> [Critter]:
         """
         Filters list of all bugs and fish to ones arriving or leaving this month
         """
@@ -162,7 +125,7 @@ class Search(commands.Cog):
     @staticmethod
     async def list_of_critter_changing(self, species: str, change_type: str, hemisphere: Hemisphere) -> [Critter]:
         """
-        Formats and returns a list of all critters of a given species leaving or arriving depending on the command called
+        Formats and returns a list of all critters of a given species leaving or arriving
         """
         # get the full list of critters of the specified species
         c.execute(utils.search_all_critters(species, ""))
