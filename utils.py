@@ -10,11 +10,22 @@ def check_if_it_is_dev(ctx):
         return True
 
 
+# TODO: Remove this and add proper database queries
+def double_apostrophes(text):
+    new_text = ""
+    for letter in text:
+        if letter == "'":
+            new_text += "'"
+        new_text += letter
+    return new_text
+
+
 # SQL STATEMENTS
 def check_for_critter(name):
+    new_name = double_apostrophes(name)
     return f"""SELECT *
                 FROM critter
-                WHERE critter_name = '{name}'"""
+                WHERE critter_name = '{new_name}'"""
 
 
 def search_all_critters(type, starts_with):
