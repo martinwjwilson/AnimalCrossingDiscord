@@ -106,6 +106,7 @@ class Search(commands.Cog):
         if change_type == "arriving" and critter.is_arriving(hemisphere):
             return True
         elif change_type == "leaving" and critter.is_leaving(hemisphere):
+            print(critter.name)
             return True
         else:
             return False
