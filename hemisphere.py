@@ -5,8 +5,8 @@ from dateutil.relativedelta import relativedelta
 
 
 class Hemisphere(Enum):
-    NORTH = "n"
-    SOUTH = "s"
+    NORTH = "north"
+    SOUTH = "south"
 
     def calculate_current_month(self) -> str:
         if self == self.NORTH:
@@ -15,13 +15,11 @@ class Hemisphere(Enum):
             return (datetime.datetime.now() + relativedelta(months=6)).strftime("%B")
 
     @staticmethod
-    def convert_text_to_hemisphere(text: str):
+    def convert_to_hemisphere(raw_hemisphere: str):
         """
-        Take text and convert it into a valid hemisphere
+        param raw_hemisphere: Example input = 'north'
         """
-        # Sanitise the input
-        clean_text = text.strip().lower()
-        if clean_text == Hemisphere.SOUTH.value:
+        if raw_hemisphere == Hemisphere.SOUTH.value:
             return Hemisphere.SOUTH
         else:
             return Hemisphere.NORTH

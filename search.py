@@ -156,7 +156,8 @@ class Search(commands.Cog):
         Display a list of all fish and bugs arriving in the current month
         """
         # Convert the user input to work out which hemisphere is being checked
-        hemisphere = Hemisphere.convert_text_to_hemisphere(user_hemisphere)
+        clean_user_hemisphere = user_hemisphere.strip().lower()
+        hemisphere = Hemisphere.convert_text_to_hemisphere(clean_user_hemisphere)
         # Display lists of the critters arriving
         # fish
         await self.display_list_of_changing_critters(self, ctx, "Fish", "arriving", hemisphere)
@@ -169,7 +170,8 @@ class Search(commands.Cog):
         Display a list of all fish and bugs leaving in the current month
         """
         # Convert the user input to work out which hemisphere is being checked
-        hemisphere = Hemisphere.convert_text_to_hemisphere(user_hemisphere)
+        clean_user_hemisphere = user_hemisphere.strip().lower()
+        hemisphere = Hemisphere.convert_text_to_hemisphere(clean_user_hemisphere)
         # Display lists of the critters arriving
         # fish
         await self.display_list_of_changing_critters(self, ctx, "Fish", "leaving", hemisphere)
