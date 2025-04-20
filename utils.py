@@ -28,10 +28,10 @@ def check_for_critter(name):
                 WHERE critter_name = '{new_name}'"""
 
 
-def search_all_critters(type, starts_with):
+def search_all_critters(critter_type, starts_with):
     return f"""SELECT *
                 FROM critter
-                WHERE species = '{type}'
+                WHERE species = '{critter_type}'
                 {starts_with}
                 ORDER BY critter_name ASC"""
 
