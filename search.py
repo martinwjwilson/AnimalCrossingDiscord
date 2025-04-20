@@ -1,8 +1,5 @@
 from datetime import datetime
-
-import disnake
 from dateutil.relativedelta import relativedelta
-from disnake.ext import commands
 import utils
 import sqlite3
 import typing
@@ -16,11 +13,8 @@ c = conn.cursor()
 
 
 class Search(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
     @staticmethod
-    async def format_input(input_string: str) -> str:
+    def format_input(input_string: str) -> str:
         """
         Format a string to match the style of the db entries
         """
@@ -33,7 +27,7 @@ class Search(commands.Cog):
         return " ".join(output)  # join words back together with a space between them
 
     @staticmethod
-    async def availability_review(critter: Critter):
+    def availability_review(critter: Critter):
         """
         Check the availability for an individual critter
         """
@@ -61,7 +55,7 @@ class Search(commands.Cog):
         return False
 
     @staticmethod
-    async def this_month_critter_filter(self, list_of_critters: [Critter]) -> [Critter]:
+    def this_month_critter_filter(self, list_of_critters: [Critter]) -> [Critter]:
         """
         filters list of critters to ones available this month
         """
@@ -72,8 +66,7 @@ class Search(commands.Cog):
                 critters_available_list.append(critter)
         return critters_available_list
 
-    @commands.command()
-    async def month(self, ctx):
+    def month(self, ctx):
         """
         Get a list of all fish and bugs available this month
         """
@@ -96,7 +89,7 @@ class Search(commands.Cog):
         await ctx.send(embed=embed_b)
 
     @staticmethod
-    async def critter_fits_change_check(critter: Critter, change_type: str, hemisphere: Hemisphere) -> bool:
+    def critter_fits_change_check(critter: Critter, change_type: str, hemisphere: Hemisphere) -> bool:
         """
         Check if a critter follows the change being checked against
         Return a bool representing if the critter does or doesn't follow the change
@@ -111,7 +104,7 @@ class Search(commands.Cog):
         else:
             return False
 
-    async def critter_filter_by_changing(self, list_of_critters: [Critter], change_type: str,
+    def critter_filter_by_changing(self, list_of_critters: [Critter], change_type: str,
                                          hemisphere: Hemisphere) -> [Critter]:
         """
         Filters list of all bugs and fish to ones arriving or leaving this month
@@ -124,7 +117,7 @@ class Search(commands.Cog):
         return critters_available_list
 
     @staticmethod
-    async def list_of_critter_changing(self, species: str, change_type: str, hemisphere: Hemisphere) -> [Critter]:
+    def list_of_critter_changing(self, species: str, change_type: str, hemisphere: Hemisphere) -> [Critter]:
         """
         Formats and returns a list of all critters of a given species leaving or arriving
         """
@@ -136,7 +129,7 @@ class Search(commands.Cog):
         return critters_available_list
 
     @staticmethod
-    async def display_list_of_changing_critters(self, ctx, critter_type, change_type: str, hemisphere: Hemisphere):
+    def display_list_of_changing_critters(self, ctx, critter_type, change_type: str, hemisphere: Hemisphere):
         """
         Displays lists of all critters of the specified type that are arriving or leaving
         """
@@ -150,8 +143,7 @@ class Search(commands.Cog):
         # send embed
         await ctx.send(embed=embed)
 
-    @commands.command()
-    async def arriving(self, ctx, user_hemisphere: typing.Optional[str] = "n"):
+    def arriving(self, ctx, user_hemisphere: typing.Optional[str] = "n"):
         """
         Display a list of all fish and bugs arriving in the current month
         """
@@ -164,8 +156,7 @@ class Search(commands.Cog):
         # bugs
         await self.display_list_of_changing_critters(self, ctx, "Bug", "arriving", hemisphere)
 
-    @commands.command()
-    async def leaving(self, ctx, user_hemisphere: typing.Optional[str] = "n"):
+    def leaving(self, ctx, user_hemisphere: typing.Optional[str] = "n"):
         """
         Display a list of all fish and bugs leaving in the current month
         """
@@ -178,7 +169,7 @@ class Search(commands.Cog):
         # bugs
         await self.display_list_of_changing_critters(self, ctx, "Bug", "leaving", hemisphere)
 
-    async def all_critter_by_species(self, species_type: str, starts_with: str) -> [Critter]:
+    def all_critter_by_species(self, species_type: str, starts_with: str) -> [Critter]:
         """
         Get a list from the database of all critters of a given species
         Restrict the search to names starting with the 'starts_with' variable if provided
@@ -192,14 +183,14 @@ class Search(commands.Cog):
         return critter_list
 
     @staticmethod
-    async def critter_list_to_string_of_names(critter_list: [Critter]) -> str:
+    def critter_list_to_string_of_names(critter_list: [Critter]) -> str:
         critter_names = ""
         for critter in critter_list:
             critter_names = critter_names + f"{critter.name}\n"
         return critter_names
 
     @staticmethod
-    async def create_critter(critter: list) -> Critter:
+    def create_critter(critter: list) -> Critter:
         return Critter(
             name=critter[0],
             species=critter[1],
@@ -218,7 +209,7 @@ class Search(commands.Cog):
         )
 
     @staticmethod
-    async def create_critter_list(critter_list: list) -> [Critter]:
+    def create_critter_list(critter_list: list) -> [Critter]:
         critter_class_list = []
         for critter in critter_list:
             critter_class_list.append(Critter(
@@ -239,8 +230,7 @@ class Search(commands.Cog):
             ))
         return critter_class_list
 
-    @commands.command()
-    async def fish(self, ctx, starts_with: typing.Optional[str] = ""):
+    def fish(self, ctx, starts_with: typing.Optional[str] = ""):
         """
         Display a list of all fish by name
         If input is provided then find names beginning with the input
@@ -250,8 +240,7 @@ class Search(commands.Cog):
         embed = disnake.Embed(title="Fish search", description=fish_names)
         await ctx.send(embed=embed)
 
-    @commands.command()
-    async def bug(self, ctx, starts_with: typing.Optional[str] = ""):
+    def bug(self, ctx, starts_with: typing.Optional[str] = ""):
         """
         Display a list of all bugs by name
         If input is provided then find names beginning with the input
@@ -261,8 +250,7 @@ class Search(commands.Cog):
         embed = disnake.Embed(title="Bug search", description=bug_names)
         await ctx.send(embed=embed)
 
-    @commands.command()
-    async def s(self, ctx, *, critter_name: str):
+    def s(self, ctx, *, critter_name: str):
         """
         Search for a critter by name and display all of its information
         """
@@ -288,7 +276,3 @@ class Search(commands.Cog):
             await ctx.send(
                 f"Sorry, {critter_name} is not a valid critter name\nPlease try using the `bug` or `fish` "
                 f"commands to check your spelling against the listed species")
-
-
-def setup(bot):
-    bot.add_cog(Search(bot))
