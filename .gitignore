@@ -1,6 +1,6 @@
 # Don't track content of these folders
 _pycache_/
-env/
+venv/
 .idea/
 
 # Don't track these files
