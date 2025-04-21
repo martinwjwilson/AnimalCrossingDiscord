@@ -1,2 +1,6 @@
+from search import Search
+
+
 if __name__ == '__main__':
-    print("Hello there")
+    search = Search()
+    search.month()

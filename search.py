@@ -12,20 +12,7 @@ conn = sqlite3.connect("ailurus.db")
 c = conn.cursor()
 
 
-class Search(commands.Cog):
-    @staticmethod
-    def format_input(input_string: str) -> str:
-        """
-        Format a string to match the style of the db entries
-        """
-        str_input = "".join(input_string)  # join arguments together
-        # fix casing
-        word_list = str_input.lower().split(" ")  # make the string lowercase then split each word by space
-        output = []
-        for word in word_list:
-            output.append(word.capitalize())  # capitalise all lowercase words in list
-        return " ".join(output)  # join words back together with a space between them
-
+class Search:
     @staticmethod
     def availability_review(critter: Critter):
         """
@@ -62,31 +49,27 @@ class Search(commands.Cog):
         critters_available_list = []  # list of critters available this month
         # check each critter against the current date
         for critter in list_of_critters:
-            if await self.availability_review(critter):
+            if self.availability_review(critter):
                 critters_available_list.append(critter)
         return critters_available_list
 
-    def month(self, ctx):
+    def month(self):
         """
         Get a list of all fish and bugs available this month
         """
         # get all fish
-        c.execute(utils.search_all_critters("Fish", ""))  # Execute the SQL check
-        fish_list = await self.create_critter_list(list(c.fetchall()))
+        c.execute(utils.search_all_critters("Fish"))
+        fish_list = self.create_critter_list(list(c.fetchall()))
         # get all bugs
-        c.execute(utils.search_all_critters("Bug", ""))  # Execute the SQL check
-        bug_list = await self.create_critter_list(list(c.fetchall()))
+        c.execute(utils.search_all_critters("Bug"))
+        bug_list = self.create_critter_list(list(c.fetchall()))
         # get a list of all fish available this month
-        fish_available_list = await self.this_month_critter_filter(self, fish_list)
-        description_f = await self.critter_list_to_string_of_names(fish_available_list)
+        fish_available_list = self.this_month_critter_filter(self, fish_list)
+        fish_available_names = self.critter_list_to_string_of_names(fish_available_list)
         # get a list of all bugs available this month
-        bug_available_list = await self.this_month_critter_filter(self, bug_list)
-        description_b = await self.critter_list_to_string_of_names(bug_available_list)
-        # create embeds
-        embed_f = disnake.Embed(title="List of Fish available this month", description=description_f)
-        embed_b = disnake.Embed(title="List of Bugs available this month", description=description_b)
-        await ctx.send(embed=embed_f)
-        await ctx.send(embed=embed_b)
+        bug_available_list = self.this_month_critter_filter(self, bug_list)
+        bugs_available_names = self.critter_list_to_string_of_names(bug_available_list)
+        print(fish_available_names)
 
     @staticmethod
     def critter_fits_change_check(critter: Critter, change_type: str, hemisphere: Hemisphere) -> bool:
@@ -105,27 +88,15 @@ class Search(commands.Cog):
             return False
 
     def critter_filter_by_changing(self, list_of_critters: [Critter], change_type: str,
-                                         hemisphere: Hemisphere) -> [Critter]:
+                                   hemisphere: Hemisphere) -> [Critter]:
         """
         Filters list of all bugs and fish to ones arriving or leaving this month
         """
         critters_available_list = []  # list of critters available this month
         # check each critter against the current date
         for critter in list_of_critters:
-            if await self.critter_fits_change_check(critter, change_type, hemisphere):
+            if self.critter_fits_change_check(critter, change_type, hemisphere):
                 critters_available_list.append(critter)
-        return critters_available_list
-
-    @staticmethod
-    def list_of_critter_changing(self, species: str, change_type: str, hemisphere: Hemisphere) -> [Critter]:
-        """
-        Formats and returns a list of all critters of a given species leaving or arriving
-        """
-        # get the full list of critters of the specified species
-        c.execute(utils.search_all_critters(species, ""))
-        all_critter_list = await self.create_critter_list(list(c.fetchall()))
-        # filter the list to only show changing critters
-        critters_available_list = await self.critter_filter_by_changing(all_critter_list, change_type, hemisphere)
         return critters_available_list
 
     @staticmethod
@@ -134,14 +105,14 @@ class Search(commands.Cog):
         Displays lists of all critters of the specified type that are arriving or leaving
         """
         # get a list of all critters
-        all_critters_list = await self.list_of_critter_changing(self, critter_type, change_type, hemisphere)
+        all_critters_list = self.__list_of_critter_changing(self, critter_type, change_type, hemisphere)
         # get a list of all critter names as strings
-        all_critters_string = await self.critter_list_to_string_of_names(all_critters_list)
+        all_critters_string = self.critter_list_to_string_of_names(all_critters_list)
         # create embeds
         embed = disnake.Embed(title=f"List of {critter_type} {change_type} this month",
                               description=all_critters_string)
         # send embed
-        await ctx.send(embed=embed)
+        ctx.send(embed=embed)
 
     def arriving(self, ctx, user_hemisphere: typing.Optional[str] = "n"):
         """
@@ -152,9 +123,9 @@ class Search(commands.Cog):
         hemisphere = Hemisphere.convert_text_to_hemisphere(clean_user_hemisphere)
         # Display lists of the critters arriving
         # fish
-        await self.display_list_of_changing_critters(self, ctx, "Fish", "arriving", hemisphere)
+        self.display_list_of_changing_critters(self, ctx, "Fish", "arriving", hemisphere)
         # bugs
-        await self.display_list_of_changing_critters(self, ctx, "Bug", "arriving", hemisphere)
+        self.display_list_of_changing_critters(self, ctx, "Bug", "arriving", hemisphere)
 
     def leaving(self, ctx, user_hemisphere: typing.Optional[str] = "n"):
         """
@@ -165,9 +136,9 @@ class Search(commands.Cog):
         hemisphere = Hemisphere.convert_text_to_hemisphere(clean_user_hemisphere)
         # Display lists of the critters arriving
         # fish
-        await self.display_list_of_changing_critters(self, ctx, "Fish", "leaving", hemisphere)
+        self.display_list_of_changing_critters(self, ctx, "Fish", "leaving", hemisphere)
         # bugs
-        await self.display_list_of_changing_critters(self, ctx, "Bug", "leaving", hemisphere)
+        self.display_list_of_changing_critters(self, ctx, "Bug", "leaving", hemisphere)
 
     def all_critter_by_species(self, species_type: str, starts_with: str) -> [Critter]:
         """
@@ -176,10 +147,10 @@ class Search(commands.Cog):
         """
         # check if the search should be restricted
         if starts_with != "":
-            starts_with = await self.format_input(starts_with)  # format the input
+            starts_with = self.__format_input(starts_with)  # format the input
             starts_with = f"AND critter_name LIKE '{starts_with}%'"  # add sql for search
         c.execute(utils.search_all_critters(species_type, starts_with))  # Execute the SQL check
-        critter_list = await self.create_critter_list(list(c.fetchall()))
+        critter_list = self.create_critter_list(list(c.fetchall()))
         return critter_list
 
     @staticmethod
@@ -191,6 +162,7 @@ class Search(commands.Cog):
 
     @staticmethod
     def create_critter(critter: list) -> Critter:
+        # https://www.reddit.com/r/learnpython/comments/pg9yv7/how_to_turn_json_into_objects_in_python/
         return Critter(
             name=critter[0],
             species=critter[1],
@@ -235,30 +207,30 @@ class Search(commands.Cog):
         Display a list of all fish by name
         If input is provided then find names beginning with the input
         """
-        fish_list = await self.all_critter_by_species("Fish", starts_with)  # get a list of all fish
-        fish_names = await self.critter_list_to_string_of_names(fish_list)  # convert fish to list of their names
+        fish_list = self.all_critter_by_species("Fish", starts_with)  # get a list of all fish
+        fish_names = self.critter_list_to_string_of_names(fish_list)  # convert fish to list of their names
         embed = disnake.Embed(title="Fish search", description=fish_names)
-        await ctx.send(embed=embed)
+        ctx.send(embed=embed)
 
     def bug(self, ctx, starts_with: typing.Optional[str] = ""):
         """
         Display a list of all bugs by name
         If input is provided then find names beginning with the input
         """
-        bug_list = await self.all_critter_by_species("Bug", starts_with)  # get a list of all bug names
-        bug_names = await self.critter_list_to_string_of_names(bug_list)
+        bug_list = self.all_critter_by_species("Bug", starts_with)  # get a list of all bug names
+        bug_names = self.critter_list_to_string_of_names(bug_list)
         embed = disnake.Embed(title="Bug search", description=bug_names)
-        await ctx.send(embed=embed)
+        ctx.send(embed=embed)
 
     def s(self, ctx, *, critter_name: str):
         """
         Search for a critter by name and display all of its information
         """
-        critter_name = await self.format_input(critter_name)  # alter the user input to match the db format
+        critter_name = self.__format_input(critter_name)  # alter the user input to match the db format
         # Check the critter table to see if any of the critter names match the user input
         c.execute(utils.check_for_critter(critter_name))
         try:
-            critter = await self.create_critter(list(c.fetchone()))
+            critter = self.create_critter(list(c.fetchone()))
             # create embed
             embed = disnake.Embed(title=f'{critter.name} Info',
                                   description=f"Everything you need to know about the {critter.name}")
@@ -271,8 +243,35 @@ class Search(commands.Cog):
             embed.add_field(name="Time:", value=f"{critter.start_time} - {critter.end_time}", inline=False)
             embed.add_field(name="Month:", value=f"{critter.start_month} - {critter.end_month}", inline=False)
             embed.set_image(url=critter.image_url)
-            await ctx.send(embed=embed)
+            ctx.send(embed=embed)
         except Exception as e:
-            await ctx.send(
+            ctx.send(
                 f"Sorry, {critter_name} is not a valid critter name\nPlease try using the `bug` or `fish` "
                 f"commands to check your spelling against the listed species")
+
+    # PRIVATE
+
+    @staticmethod
+    def __format_input(input_string: str) -> str:
+        """
+        Format a string to match the style of the db entries
+        """
+        str_input = "".join(input_string)  # join arguments together
+        # fix casing
+        word_list = str_input.lower().split(" ")  # make the string lowercase then split each word by space
+        output = []
+        for word in word_list:
+            output.append(word.capitalize())  # capitalise all lowercase words in list
+        return " ".join(output)  # join words back together with a space between them
+
+    @staticmethod
+    def __list_of_critter_changing(species: str, change_type: str, hemisphere: Hemisphere) -> [Critter]:
+        """
+        Formats and returns a list of all critters of a given species leaving or arriving
+        """
+        # get the full list of critters of the specified species
+        c.execute(utils.search_all_critters(species, ""))
+        all_critter_list = create_critter_list(list(c.fetchall()))
+        # filter the list to only show changing critters
+        critters_available_list = critter_filter_by_changing(all_critter_list, change_type, hemisphere)
+        return critters_available_list
