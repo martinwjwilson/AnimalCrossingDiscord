@@ -30,19 +30,18 @@ class Search:
         bug_available_list = self._this_month_critter_filter(bug_list)
         bugs_available_names = self._critter_list_to_string_of_names(bug_available_list)
         print(fish_available_names)
+        print(bugs_available_names)
 
-    def arriving(self, ctx, user_hemisphere: typing.Optional[str] = "n"):
+    def arriving(self, user_hemisphere: typing.Optional[str] = "n"):
         """
         Display a list of all fish and bugs arriving in the current month
         """
         # Convert the user input to work out which hemisphere is being checked
         clean_user_hemisphere = user_hemisphere.strip().lower()
-        hemisphere = Hemisphere.convert_text_to_hemisphere(clean_user_hemisphere)
+        hemisphere = Hemisphere.convert_to_hemisphere(clean_user_hemisphere)
         # Display lists of the critters arriving
-        # fish
-        self._display_list_of_changing_critters(self, ctx, "Fish", "arriving", hemisphere)
-        # bugs
-        self._display_list_of_changing_critters(self, ctx, "Bug", "arriving", hemisphere)
+        self._display_list_of_changing_critters(self, "Fish", "arriving", hemisphere)
+        self._display_list_of_changing_critters(self, "Bug", "arriving", hemisphere)
 
     def leaving(self, ctx, user_hemisphere: typing.Optional[str] = "n"):
         """
@@ -86,13 +85,14 @@ class Search:
         c.execute(utils.check_for_critter(critter_name))
         try:
             critter = self._create_critter(list(c.fetchone()))
+            # TODO: Don't create an embed here
             # create embed
             embed = disnake.Embed(title=f'{critter.name} Info',
                                   description=f"Everything you need to know about the {critter.name}")
             embed.add_field(name="Name:", value=critter.name, inline=False)
             embed.add_field(name="Type:", value=critter.species, inline=False)
             embed.add_field(name="Location:", value=critter.location, inline=False)
-            if critter.species == 'Fish':  # if critter was a fish
+            if critter.species == 'Fish':
                 embed.add_field(name="Size:", value=critter.size, inline=False)
             embed.add_field(name="Value:", value=critter.value, inline=False)
             embed.add_field(name="Time:", value=f"{critter.start_time} - {critter.end_time}", inline=False)
@@ -101,8 +101,8 @@ class Search:
             ctx.send(embed=embed)
         except Exception as e:
             ctx.send(
-                f"Sorry, {critter_name} is not a valid critter name\nPlease try using the `bug` or `fish` "
-                f"commands to check your spelling against the listed species")
+                f"Sorry, {critter_name} is not a valid critter name\n"
+                f"Please try using the 'bug' or 'fish' commands to check your spelling against the listed species")
 
     # PRIVATE
 
@@ -119,16 +119,15 @@ class Search:
             output.append(word.capitalize())  # capitalise all lowercase words in list
         return " ".join(output)  # join words back together with a space between them
 
-    @staticmethod
-    def _list_of_critter_changing(species: str, change_type: str, hemisphere: Hemisphere) -> [Critter]:
+    def _list_of_critter_changing(self, species: str, change_type: str, hemisphere: Hemisphere) -> [Critter]:
         """
         Formats and returns a list of all critters of a given species leaving or arriving
         """
         # get the full list of critters of the specified species
         c.execute(utils.search_all_critters(species, ""))
-        all_critter_list = create_critter_list(list(c.fetchall()))
+        all_critter_list = self._create_critter_list(list(c.fetchall()))
         # filter the list to only show changing critters
-        critters_available_list = _critter_filter_by_changing(all_critter_list, change_type, hemisphere)
+        critters_available_list = self._critter_filter_by_changing(all_critter_list, change_type, hemisphere)
         return critters_available_list
 
     @staticmethod
@@ -199,19 +198,15 @@ class Search:
         return critters_available_list
 
     @staticmethod
-    def _display_list_of_changing_critters(self, ctx, critter_type, change_type: str, hemisphere: Hemisphere):
+    def _display_list_of_changing_critters(self, critter_type, change_type: str, hemisphere: Hemisphere):
         """
         Displays lists of all critters of the specified type that are arriving or leaving
         """
         # get a list of all critters
-        all_critters_list = self._list_of_critter_changing(self, critter_type, change_type, hemisphere)
+        all_critters_list = self._list_of_critter_changing(critter_type, change_type, hemisphere)
         # get a list of all critter names as strings
         all_critters_string = self._critter_list_to_string_of_names(all_critters_list)
-        # create embeds
-        embed = disnake.Embed(title=f"List of {critter_type} {change_type} this month",
-                              description=all_critters_string)
-        # send embed
-        ctx.send(embed=embed)
+        print(f"List of {critter_type} {change_type} this month: \n{all_critters_string}")
 
     def _all_critter_by_species(self, species_type: str, starts_with: str) -> [Critter]:
         """
