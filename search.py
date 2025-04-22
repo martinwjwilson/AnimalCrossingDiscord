@@ -54,14 +54,14 @@ class Search:
         self._display_list_of_changing_critters(self, "Fish", "leaving", hemisphere)
         self._display_list_of_changing_critters(self, "Bug", "leaving", hemisphere)
 
-    def fish(self, ctx, starts_with: typing.Optional[str] = ""):
+    def fish(self, starts_with: typing.Optional[str] = ""):
         """
         Display a list of all fish by name
         If input is provided then find names beginning with the input
         """
-        fish_list = self._all_critter_by_species("Fish", starts_with)  # get a list of all fish
-        fish_names = self._critter_list_to_string_of_names(fish_list)  # convert fish to list of their names
-        embed = disnake.Embed(title="Fish search", description=fish_names)
+        fish_list = self._all_critter_by_species("Fish", starts_with)
+        fish_names = self._critter_list_to_string_of_names(fish_list)
+        print(f"Fish Search: \n{fish_names}")
         ctx.send(embed=embed)
 
     def bug(self, ctx, starts_with: typing.Optional[str] = ""):

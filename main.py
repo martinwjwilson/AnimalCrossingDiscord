@@ -12,5 +12,7 @@ if __name__ == '__main__':
                 search.arriving()
             case "leaving":
                 search.leaving()
+            case "fish":
+                search.fish()
             case _:
                 print("Sorry that doesn't match any of my commands\n")
