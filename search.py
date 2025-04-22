@@ -72,7 +72,7 @@ class Search:
         bug_names = self._critter_list_to_string_of_names(bug_list)
         print(f"Bug Search: \n{bug_names}")
 
-    def s(self, ctx, *, critter_name: str):
+    def s(self, critter_name: str):
         """
         Search for a critter by name and display all of its information
         """
@@ -81,24 +81,19 @@ class Search:
         c.execute(utils.check_for_critter(critter_name))
         try:
             critter = self._create_critter(list(c.fetchone()))
-            # TODO: Don't create an embed here
-            # create embed
-            embed = disnake.Embed(title=f'{critter.name} Info',
-                                  description=f"Everything you need to know about the {critter.name}")
-            embed.add_field(name="Name:", value=critter.name, inline=False)
-            embed.add_field(name="Type:", value=critter.species, inline=False)
-            embed.add_field(name="Location:", value=critter.location, inline=False)
+            print(f"{critter.name} Info\n"
+                  f"Everything you need to know about the {critter.name}")
+            print(f"Name: {critter.name}")
+            print(f"Type: {critter.species}")
+            print(f"Location: {critter.location}")
             if critter.species == 'Fish':
-                embed.add_field(name="Size:", value=critter.size, inline=False)
-            embed.add_field(name="Value:", value=critter.value, inline=False)
-            embed.add_field(name="Time:", value=f"{critter.start_time} - {critter.end_time}", inline=False)
-            embed.add_field(name="Month:", value=f"{critter.start_month} - {critter.end_month}", inline=False)
-            embed.set_image(url=critter.image_url)
-            ctx.send(embed=embed)
-        except Exception as e:
-            ctx.send(
-                f"Sorry, {critter_name} is not a valid critter name\n"
-                f"Please try using the 'bug' or 'fish' commands to check your spelling against the listed species")
+                print(f"Size: {critter.size}")
+            print(f"Value: {critter.value}")
+            print(f"Time: {critter.start_time} - {critter.end_time}")
+            print(f"Month: {critter.start_month} - {critter.end_month}\n")
+        except Exception:
+            print(f"Sorry, {critter_name} is not a valid critter name\n"
+                  f"Please try using the 'bug' or 'fish' commands to check your spelling against the listed species\n")
 
     # PRIVATE
 

@@ -16,5 +16,8 @@ if __name__ == '__main__':
                 search.fish()
             case "bug":
                 search.bug()
+            case "search":
+                search_term = input("What would you like to search for?\n")
+                search.s(search_term)
             case _:
                 print("Sorry that doesn't match any of my commands\n")
