@@ -43,18 +43,16 @@ class Search:
         self._display_list_of_changing_critters(self, "Fish", "arriving", hemisphere)
         self._display_list_of_changing_critters(self, "Bug", "arriving", hemisphere)
 
-    def leaving(self, ctx, user_hemisphere: typing.Optional[str] = "n"):
+    def leaving(self, user_hemisphere: typing.Optional[str] = "n"):
         """
         Display a list of all fish and bugs leaving in the current month
         """
         # Convert the user input to work out which hemisphere is being checked
         clean_user_hemisphere = user_hemisphere.strip().lower()
-        hemisphere = Hemisphere.convert_text_to_hemisphere(clean_user_hemisphere)
+        hemisphere = Hemisphere.convert_to_hemisphere(clean_user_hemisphere)
         # Display lists of the critters arriving
-        # fish
-        self._display_list_of_changing_critters(self, ctx, "Fish", "leaving", hemisphere)
-        # bugs
-        self._display_list_of_changing_critters(self, ctx, "Bug", "leaving", hemisphere)
+        self._display_list_of_changing_critters(self, "Fish", "leaving", hemisphere)
+        self._display_list_of_changing_critters(self, "Bug", "leaving", hemisphere)
 
     def fish(self, ctx, starts_with: typing.Optional[str] = ""):
         """
@@ -180,7 +178,6 @@ class Search:
         if change_type == "arriving" and critter.is_arriving(hemisphere):
             return True
         elif change_type == "leaving" and critter.is_leaving(hemisphere):
-            print(critter.name)
             return True
         else:
             return False
@@ -190,7 +187,7 @@ class Search:
         """
         Filters list of all bugs and fish to ones arriving or leaving this month
         """
-        critters_available_list = []  # list of critters available this month
+        critters_available_list = []
         # check each critter against the current date
         for critter in list_of_critters:
             if self._critter_fits_change_check(critter, change_type, hemisphere):

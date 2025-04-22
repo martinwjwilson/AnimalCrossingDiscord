@@ -10,5 +10,7 @@ if __name__ == '__main__':
                 search.month()
             case "arriving":
                 search.arriving()
+            case "leaving":
+                search.leaving()
             case _:
                 print("Sorry that doesn't match any of my commands\n")

@@ -36,7 +36,6 @@ class Critter:
         Check if a critter is leaving based on a given hemisphere
         """
         if self.availability_changing([self.end_month, self.alt_end_month], current_hemisphere):
-            print(f"end month:{self.end_month}\nalt end month:{self.alt_end_month}")
             return True
         else:
             return False
