@@ -20,28 +20,24 @@ class Critter:
         self.image_url = image_url
 
     def get_critter_time_period(self):
-        print(self.start_month)
+        print(f"{self.start_month} - {self.end_month}")
 
     def is_arriving(self, current_hemisphere: Hemisphere) -> bool:
         """
         Check if the critter is arriving based on a given hemisphere
         """
-        if self.availability_changing([self.start_month, self.alt_start_month], current_hemisphere):
-            return True
-        else:
-            return False
+        return self._availability_changing([self.start_month, self.alt_start_month], current_hemisphere)
 
     def is_leaving(self, current_hemisphere: Hemisphere) -> bool:
         """
         Check if a critter is leaving based on a given hemisphere
         """
-        if self.availability_changing([self.end_month, self.alt_end_month], current_hemisphere):
-            return True
-        else:
-            return False
+        return self._availability_changing([self.end_month, self.alt_end_month], current_hemisphere)
+
+    # PRIVATE
 
     @staticmethod
-    def availability_changing(months_to_check: [str], current_hemisphere: Hemisphere) -> bool:
+    def _availability_changing(months_to_check: [str], current_hemisphere: Hemisphere) -> bool:
         """
         Takes a list of months and checks if any match the current month based on the hemisphere
         """
