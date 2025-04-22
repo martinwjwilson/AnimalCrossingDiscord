@@ -62,17 +62,15 @@ class Search:
         fish_list = self._all_critter_by_species("Fish", starts_with)
         fish_names = self._critter_list_to_string_of_names(fish_list)
         print(f"Fish Search: \n{fish_names}")
-        ctx.send(embed=embed)
 
-    def bug(self, ctx, starts_with: typing.Optional[str] = ""):
+    def bug(self, starts_with: typing.Optional[str] = ""):
         """
         Display a list of all bugs by name
         If input is provided then find names beginning with the input
         """
-        bug_list = self._all_critter_by_species("Bug", starts_with)  # get a list of all bug names
+        bug_list = self._all_critter_by_species("Bug", starts_with)
         bug_names = self._critter_list_to_string_of_names(bug_list)
-        embed = disnake.Embed(title="Bug search", description=bug_names)
-        ctx.send(embed=embed)
+        print(f"Bug Search: \n{bug_names}")
 
     def s(self, ctx, *, critter_name: str):
         """
