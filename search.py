@@ -17,22 +17,8 @@ class Search:
         """
         Get a list of all fish and bugs available this month
         """
-        # get all fish
-        params = ("Fish",)
-        c.execute(utils.QUERY_SEARCH_ALL_CRITTERS, params)
-        fish_list = self._create_critter_list(list(c.fetchall()))
-        # get all bugs
-        params = ("Bug",)
-        c.execute(utils.QUERY_SEARCH_ALL_CRITTERS, params)
-        bug_list = self._create_critter_list(list(c.fetchall()))
-        # get a list of all fish available this month
-        fish_available_list = self._this_month_critter_filter(fish_list)
-        fish_available_names = self._critter_list_to_string_of_names(fish_available_list)
-        # get a list of all bugs available this month
-        bug_available_list = self._this_month_critter_filter(bug_list)
-        bugs_available_names = self._critter_list_to_string_of_names(bug_available_list)
-        print(fish_available_names)
-        print(bugs_available_names)
+        print(self._critters_available_this_month("Fish"))
+        print(self._critters_available_this_month("Bug"))
 
     def arriving(self, user_hemisphere: typing.Optional[str] = "n"):
         """
@@ -89,6 +75,13 @@ class Search:
                   f"Please try using the 'bug' or 'fish' commands to check your spelling against the listed species\n")
 
     # PRIVATE
+
+    def _critters_available_this_month(self, critter: str):
+        params = (critter,)
+        c.execute(utils.QUERY_SEARCH_ALL_CRITTERS, params)
+        all_critters = self._create_critter_list(list(c.fetchall()))
+        critter_available_list = self._this_month_critter_filter(all_critters)
+        return self._critter_list_to_string_of_names(critter_available_list)
 
     @staticmethod
     def _format_input(input_string: str) -> str:
