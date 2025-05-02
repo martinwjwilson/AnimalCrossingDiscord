@@ -9,7 +9,7 @@ from hemisphere import Hemisphere
 
 # db
 conn = sqlite3.connect("ailurus.db")
-c = conn.cursor()
+cur = conn.cursor()
 
 
 class Search:
@@ -66,9 +66,9 @@ class Search:
         """
         critter_name = self._format_input(critter_name)  # alter the user input to match the db format
         params = (critter_name,)
-        c.execute(utils.QUERY_SEARCH_FOR_CRITTER_NAMED, params)
+        cur.execute(utils.QUERY_SEARCH_FOR_CRITTER_NAMED, params)
         try:
-            critter = self._create_critter(list(c.fetchone()))
+            critter = self._create_critter(list(cur.fetchone()))
             self._display_critter_info(critter)
         except Exception:
             print(f"Sorry, {critter_name} is not a valid critter name\n"
@@ -78,8 +78,8 @@ class Search:
 
     def _critters_available_this_month(self, critter: str):
         params = (critter,)
-        c.execute(utils.QUERY_SEARCH_ALL_CRITTERS, params)
-        all_critters = self._create_critter_list(list(c.fetchall()))
+        cur.execute(utils.QUERY_SEARCH_ALL_CRITTERS, params)
+        all_critters = self._create_critter_list(list(cur.fetchall()))
         critter_available_list = self._this_month_critter_filter(all_critters)
         return self._critter_list_to_string_of_names(critter_available_list)
 
@@ -102,11 +102,10 @@ class Search:
         """
         # get the full list of critters of the specified species
         params = (species,)
-        c.execute(utils.QUERY_SEARCH_ALL_CRITTERS, params)
-        all_critter_list = self._create_critter_list(list(c.fetchall()))
+        cur.execute(utils.QUERY_SEARCH_ALL_CRITTERS, params)
+        all_critter_list = self._create_critter_list(list(cur.fetchall()))
         # filter the list to only show changing critters
-        critters_available_list = self._critter_filter_by_changing(all_critter_list, change_type, hemisphere)
-        return critters_available_list
+        return self._critter_filter_by_changing(all_critter_list, change_type, hemisphere)
 
     @staticmethod
     def _availability_review(critter: Critter):
@@ -140,7 +139,7 @@ class Search:
         """
         filters list of critters to ones available this month
         """
-        critters_available_list = []  # list of critters available this month
+        critters_available_list = []
         # check each critter against the current date
         for critter in list_of_critters:
             if self._availability_review(critter):
@@ -155,12 +154,8 @@ class Search:
         e.g. a critter leaves in June and the check is for all critters leaving in June. Return True
         """
         # check if the current month matches the critter availability
-        if change_type == "arriving" and critter.is_arriving(hemisphere):
-            return True
-        elif change_type == "leaving" and critter.is_leaving(hemisphere):
-            return True
-        else:
-            return False
+        return (change_type == "arriving" and critter.is_arriving(hemisphere) or
+                change_type == "leaving" and critter.is_leaving(hemisphere))
 
     def _critter_filter_by_changing(self, list_of_critters: [Critter], change_type: str,
                                     hemisphere: Hemisphere) -> [Critter]:
@@ -179,11 +174,10 @@ class Search:
         """
         Displays lists of all critters of the specified type that are arriving or leaving
         """
-        # get a list of all critters
-        all_critters_list = self._list_of_critter_changing(critter_type, change_type, hemisphere)
+        all_critters = self._list_of_critter_changing(critter_type, change_type, hemisphere)
         # get a list of all critter names as strings
-        all_critters_string = self._critter_list_to_string_of_names(all_critters_list)
-        print(f"List of {critter_type} {change_type} this month: \n{all_critters_string}")
+        all_critters_names = self._critter_list_to_string_of_names(all_critters)
+        print(f"List of {critter_type} {change_type} this month: \n{all_critters_names}")
 
     def _all_critter_by_species(self, species_type: str, starts_with: str) -> [Critter]:
         """
@@ -197,8 +191,8 @@ class Search:
             params += starts_with
         else:
             query = utils.QUERY_SEARCH_ALL_CRITTERS
-        c.execute(query, params)
-        critter_list = self._create_critter_list(list(c.fetchall()))
+        cur.execute(query, params)
+        critter_list = self._create_critter_list(list(cur.fetchall()))
         return critter_list
 
     @staticmethod
