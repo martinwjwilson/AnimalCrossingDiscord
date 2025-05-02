@@ -83,16 +83,7 @@ class Search:
         c.execute(utils.QUERY_SEARCH_FOR_CRITTER_NAMED, params)
         try:
             critter = self._create_critter(list(c.fetchone()))
-            print(f"{critter.name} Info\n"
-                  f"Everything you need to know about the {critter.name}")
-            print(f"Name: {critter.name}")
-            print(f"Type: {critter.species}")
-            print(f"Location: {critter.location}")
-            if critter.species == 'Fish':
-                print(f"Size: {critter.size}")
-            print(f"Value: {critter.value}")
-            print(f"Time: {critter.start_time} - {critter.end_time}")
-            print(f"Month: {critter.start_month} - {critter.end_month}\n")
+            self._display_critter_info(critter)
         except Exception:
             print(f"Sorry, {critter_name} is not a valid critter name\n"
                   f"Please try using the 'bug' or 'fish' commands to check your spelling against the listed species\n")
@@ -223,6 +214,19 @@ class Search:
         for critter in critter_list:
             critter_names = critter_names + f"{critter.name}\n"
         return critter_names
+
+    @staticmethod
+    def _display_critter_info(critter: Critter):
+        print(f"{critter.name} Info\n"
+              f"Everything you need to know about the {critter.name}")
+        print(f"Name: {critter.name}")
+        print(f"Type: {critter.species}")
+        print(f"Location: {critter.location}")
+        if critter.species == 'Fish':
+            print(f"Size: {critter.size}")
+        print(f"Value: {critter.value}")
+        print(f"Time: {critter.start_time} - {critter.end_time}")
+        print(f"Month: {critter.start_month} - {critter.end_month}\n")
 
     @staticmethod
     def _create_critter(critter: list) -> Critter:

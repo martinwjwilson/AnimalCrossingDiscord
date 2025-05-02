@@ -1,14 +1,3 @@
-# TODO: Remove this and add proper database queries
-# https://docs.python.org/3/library/sqlite3.html#sqlite3-placeholders
-def double_apostrophes(text):
-    new_text = ""
-    for letter in text:
-        if letter == "'":
-            new_text += "'"
-        new_text += letter
-    return new_text
-
-
 # SQL STATEMENTS
 
 QUERY_SEARCH_FOR_CRITTER_NAMED = """SELECT *
