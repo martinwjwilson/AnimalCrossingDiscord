@@ -1,24 +1,17 @@
-# TODO: Remove this and add proper database queries
-def double_apostrophes(text):
-    new_text = ""
-    for letter in text:
-        if letter == "'":
-            new_text += "'"
-        new_text += letter
-    return new_text
-
-
 # SQL STATEMENTS
-def check_for_critter(name):
-    new_name = double_apostrophes(name)
-    return f"""SELECT *
+
+QUERY_SEARCH_FOR_CRITTER_NAMED = """SELECT *
                 FROM critter
-                WHERE critter_name = '{new_name}'"""
+                WHERE critter_name = ?"""
 
 
-def search_all_critters(critter_type, starts_with=""):
-    return f"""SELECT *
+QUERY_SEARCH_ALL_CRITTERS = """SELECT *
                 FROM critter
-                WHERE species = '{critter_type}'
-                {starts_with}
+                WHERE species = ?
+                ORDER BY critter_name ASC"""
+
+QUERY_SEARCH_ALL_CRITTERS_STARTING_WITH = """SELECT *
+                FROM critter
+                WHERE species = ?
+                AND critter_name LIKE ?
                 ORDER BY critter_name ASC"""

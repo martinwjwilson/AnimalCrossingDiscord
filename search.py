@@ -17,20 +17,8 @@ class Search:
         """
         Get a list of all fish and bugs available this month
         """
-        # get all fish
-        c.execute(utils.search_all_critters("Fish"))
-        fish_list = self._create_critter_list(list(c.fetchall()))
-        # get all bugs
-        c.execute(utils.search_all_critters("Bug"))
-        bug_list = self._create_critter_list(list(c.fetchall()))
-        # get a list of all fish available this month
-        fish_available_list = self._this_month_critter_filter(fish_list)
-        fish_available_names = self._critter_list_to_string_of_names(fish_available_list)
-        # get a list of all bugs available this month
-        bug_available_list = self._this_month_critter_filter(bug_list)
-        bugs_available_names = self._critter_list_to_string_of_names(bug_available_list)
-        print(fish_available_names)
-        print(bugs_available_names)
+        print(self._critters_available_this_month("Fish"))
+        print(self._critters_available_this_month("Bug"))
 
     def arriving(self, user_hemisphere: typing.Optional[str] = "n"):
         """
@@ -77,25 +65,23 @@ class Search:
         Search for a critter by name and display all of its information
         """
         critter_name = self._format_input(critter_name)  # alter the user input to match the db format
-        # Check the critter table to see if any of the critter names match the user input
-        c.execute(utils.check_for_critter(critter_name))
+        params = (critter_name,)
+        c.execute(utils.QUERY_SEARCH_FOR_CRITTER_NAMED, params)
         try:
             critter = self._create_critter(list(c.fetchone()))
-            print(f"{critter.name} Info\n"
-                  f"Everything you need to know about the {critter.name}")
-            print(f"Name: {critter.name}")
-            print(f"Type: {critter.species}")
-            print(f"Location: {critter.location}")
-            if critter.species == 'Fish':
-                print(f"Size: {critter.size}")
-            print(f"Value: {critter.value}")
-            print(f"Time: {critter.start_time} - {critter.end_time}")
-            print(f"Month: {critter.start_month} - {critter.end_month}\n")
+            self._display_critter_info(critter)
         except Exception:
             print(f"Sorry, {critter_name} is not a valid critter name\n"
                   f"Please try using the 'bug' or 'fish' commands to check your spelling against the listed species\n")
 
     # PRIVATE
+
+    def _critters_available_this_month(self, critter: str):
+        params = (critter,)
+        c.execute(utils.QUERY_SEARCH_ALL_CRITTERS, params)
+        all_critters = self._create_critter_list(list(c.fetchall()))
+        critter_available_list = self._this_month_critter_filter(all_critters)
+        return self._critter_list_to_string_of_names(critter_available_list)
 
     @staticmethod
     def _format_input(input_string: str) -> str:
@@ -115,7 +101,8 @@ class Search:
         Formats and returns a list of all critters of a given species leaving or arriving
         """
         # get the full list of critters of the specified species
-        c.execute(utils.search_all_critters(species, ""))
+        params = (species,)
+        c.execute(utils.QUERY_SEARCH_ALL_CRITTERS, params)
         all_critter_list = self._create_critter_list(list(c.fetchall()))
         # filter the list to only show changing critters
         critters_available_list = self._critter_filter_by_changing(all_critter_list, change_type, hemisphere)
@@ -204,10 +191,13 @@ class Search:
         Restrict the search to names starting with the 'starts_with' variable if provided
         """
         # check if the search should be restricted
+        params = (species_type,)
         if starts_with != "":
-            starts_with = self._format_input(starts_with)  # format the input
-            starts_with = f"AND critter_name LIKE '{starts_with}%'"  # add sql for search
-        c.execute(utils.search_all_critters(species_type, starts_with))  # Execute the SQL check
+            query = utils.QUERY_SEARCH_ALL_CRITTERS_STARTING_WITH
+            params += starts_with
+        else:
+            query = utils.QUERY_SEARCH_ALL_CRITTERS
+        c.execute(query, params)
         critter_list = self._create_critter_list(list(c.fetchall()))
         return critter_list
 
@@ -217,6 +207,19 @@ class Search:
         for critter in critter_list:
             critter_names = critter_names + f"{critter.name}\n"
         return critter_names
+
+    @staticmethod
+    def _display_critter_info(critter: Critter):
+        print(f"{critter.name} Info\n"
+              f"Everything you need to know about the {critter.name}")
+        print(f"Name: {critter.name}")
+        print(f"Type: {critter.species}")
+        print(f"Location: {critter.location}")
+        if critter.species == 'Fish':
+            print(f"Size: {critter.size}")
+        print(f"Value: {critter.value}")
+        print(f"Time: {critter.start_time} - {critter.end_time}")
+        print(f"Month: {critter.start_month} - {critter.end_month}\n")
 
     @staticmethod
     def _create_critter(critter: list) -> Critter:
