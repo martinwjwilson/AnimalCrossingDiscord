@@ -18,10 +18,12 @@ class Search:
         Get a list of all fish and bugs available this month
         """
         # get all fish
-        c.execute(utils.search_all_critters("Fish"))
+        params = ("Fish",)
+        c.execute(utils.QUERY_SEARCH_ALL_CRITTERS, params)
         fish_list = self._create_critter_list(list(c.fetchall()))
         # get all bugs
-        c.execute(utils.search_all_critters("Bug"))
+        params = ("Bug",)
+        c.execute(utils.QUERY_SEARCH_ALL_CRITTERS, params)
         bug_list = self._create_critter_list(list(c.fetchall()))
         # get a list of all fish available this month
         fish_available_list = self._this_month_critter_filter(fish_list)
@@ -77,8 +79,8 @@ class Search:
         Search for a critter by name and display all of its information
         """
         critter_name = self._format_input(critter_name)  # alter the user input to match the db format
-        # Check the critter table to see if any of the critter names match the user input
-        c.execute(utils.check_for_critter(critter_name))
+        params = (critter_name,)
+        c.execute(utils.QUERY_SEARCH_FOR_CRITTER_NAMED, params)
         try:
             critter = self._create_critter(list(c.fetchone()))
             print(f"{critter.name} Info\n"
@@ -115,7 +117,8 @@ class Search:
         Formats and returns a list of all critters of a given species leaving or arriving
         """
         # get the full list of critters of the specified species
-        c.execute(utils.search_all_critters(species, ""))
+        params = (species,)
+        c.execute(utils.QUERY_SEARCH_ALL_CRITTERS, params)
         all_critter_list = self._create_critter_list(list(c.fetchall()))
         # filter the list to only show changing critters
         critters_available_list = self._critter_filter_by_changing(all_critter_list, change_type, hemisphere)
@@ -204,10 +207,13 @@ class Search:
         Restrict the search to names starting with the 'starts_with' variable if provided
         """
         # check if the search should be restricted
+        params = (species_type,)
         if starts_with != "":
-            starts_with = self._format_input(starts_with)  # format the input
-            starts_with = f"AND critter_name LIKE '{starts_with}%'"  # add sql for search
-        c.execute(utils.search_all_critters(species_type, starts_with))  # Execute the SQL check
+            query = utils.QUERY_SEARCH_ALL_CRITTERS_STARTING_WITH
+            params += starts_with
+        else:
+            query = utils.QUERY_SEARCH_ALL_CRITTERS
+        c.execute(query, params)
         critter_list = self._create_critter_list(list(c.fetchall()))
         return critter_list
 
